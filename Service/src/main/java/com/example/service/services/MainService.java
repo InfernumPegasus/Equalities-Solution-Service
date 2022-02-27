@@ -1,11 +1,11 @@
-package com.example.RestService.restservices;
+package com.example.service.services;
 
-public class MainRestService {
+public class MainService {
 
     private final long Id;
     private final int Root;
 
-    public MainRestService(long id, int root) {
+    public MainService(long id, int root) {
         this.Id = id;
         this.Root = root;
     }
