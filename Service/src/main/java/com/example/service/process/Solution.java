@@ -2,6 +2,8 @@ package com.example.service.process;
 
 import com.example.service.exceptions.CalculationException;
 import com.example.service.responses.CalculationResponse;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.lang.Nullable;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -10,40 +12,29 @@ public class Solution {
 
     private static final AtomicLong counter = new AtomicLong();
 
-    private @Nullable
-    Integer firstValue;
+    private @Nullable Integer firstValue;
 
-    private @Nullable
-    Integer secondValue;
+    private @Nullable Integer secondValue;
 
-    private @Nullable
-    Integer leftBorder;
+    private @Nullable Integer leftBorder;
 
-    private @Nullable
-    Integer rightBorder;
+    private @Nullable Integer rightBorder;
 
-    private @Nullable
-    Integer root;
+    private @Nullable Integer root;
 
-
-
-    @Nullable
-    public Integer getFirstValue() {
+    @Nullable public Integer getFirstValue() {
         return firstValue;
     }
 
-    @Nullable
-    public Integer getSecondValue() {
+    @Nullable public Integer getSecondValue() {
         return secondValue;
     }
 
-    @Nullable
-    public Integer getLeftBorder() {
+    @Nullable public Integer getLeftBorder() {
         return leftBorder;
     }
 
-    @Nullable
-    public Integer getRightBorder() {
+    @Nullable public Integer getRightBorder() {
         return rightBorder;
     }
 
@@ -81,7 +72,6 @@ public class Solution {
     }
 
     public CalculationResponse getResponse() throws CalculationException {
-        System.out.println("SOLUTION CREATED!");
         if (firstValue == null || secondValue == null) {
             throw new IllegalArgumentException("No arguments!");
         }
@@ -103,7 +93,7 @@ public class Solution {
     }
 
     public Solution() {
-        secondValue = firstValue = rightBorder = leftBorder = null;
+        secondValue = firstValue = rightBorder = leftBorder = root = null;
     }
 
 }

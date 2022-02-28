@@ -1,21 +1,24 @@
 package com.example.service.advice;
 
+import com.example.service.exceptions.CalculationException;
 import com.example.service.responses.ExceptionResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-@ControllerAdvice
-public class DefaultAdvice {
+@RestControllerAdvice
+public class DefaultAdvice extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(CalculationException.class)
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull CalculationException e) {
+        return new ResponseEntity<>(new ExceptionResponse(e.getMessage()), HttpStatus.OK);
+    }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionResponse> handleException(Exception e) {
-        ExceptionResponse response = new ExceptionResponse(e.getMessage());
-
-        System.out.println(e.getMessage());
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public ResponseEntity<ExceptionResponse> handleException(@NotNull Exception e) {
+        return new ResponseEntity<>(new ExceptionResponse(e.getMessage()), HttpStatus.OK);
     }
 }
