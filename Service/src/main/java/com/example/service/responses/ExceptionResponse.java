@@ -1,13 +1,10 @@
 package com.example.service.responses;
 
-public class Response {
+public class ExceptionResponse {
 
     private String message;
 
-    public Response() {
-    }
-
-    public Response(String message) {
+    public ExceptionResponse(String message) {
         this.message = message;
     }
 

@@ -1,6 +1,6 @@
 package com.example.service.advice;
 
-import com.example.service.responses.Response;
+import com.example.service.responses.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,8 +11,8 @@ public class DefaultAdvice {
 
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Response> handleException(Exception e) {
-        Response response = new Response(e.getMessage());
+    public ResponseEntity<ExceptionResponse> handleException(Exception e) {
+        ExceptionResponse response = new ExceptionResponse(e.getMessage());
 
         System.out.println(e.getMessage());
 
