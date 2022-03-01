@@ -14,11 +14,13 @@ public class DefaultAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CalculationException.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull CalculationException e) {
-        return new ResponseEntity<>(new ExceptionResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        logger.error("ERROR CODE 400", e);
+        return new ResponseEntity<>(new ExceptionResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull Exception e) {
-        return new ResponseEntity<>(new ExceptionResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+        logger.error("INTERNAL SERVER ERROR", e);
+        return new ResponseEntity<>(new ExceptionResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
