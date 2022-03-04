@@ -21,7 +21,8 @@ public class MainController {
             @RequestParam(value="second_border") @Nullable Integer second_border
             ) throws CalculationException {
 
-        var solution = new Solution(first_value, second_value, first_border, second_border);
+        Solution solution = new Solution(first_value, second_value, first_border, second_border);
+
         return new ResponseEntity<>(solution.getResponse(), HttpStatus.OK);
     }
 }

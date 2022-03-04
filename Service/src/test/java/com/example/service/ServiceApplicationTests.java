@@ -19,8 +19,18 @@ class ServiceApplicationTests {
     }
 
     @Test
-    void whenBordersAreNull() {
-        var solution = new Solution(10, 20, null, null);
+    void isSolutionCanBeFound() {
+        var s1 = new Solution(10, 20, 0, 1000);
+        s1.calculateRoot();
+
+        Solution.addToList(s1);
+
+        assertThat(s1.findInCache()).isEqualTo(10);
+    }
+
+    @Test
+    void isLeftBorderCorrectIfNull() {
+        var solution = new Solution(10, 20, null, 1000);
 
         assertThat(solution.getLeftBorder()).isEqualTo(Integer.MIN_VALUE);
     }

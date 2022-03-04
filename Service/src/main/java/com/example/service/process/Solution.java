@@ -5,9 +5,17 @@ import com.example.service.responses.CalculationResponse;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.Nullable;
 
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Solution {
+
+    private static final ArrayList<Solution> solutions = new ArrayList<>();
+
+    public static void addToList(@NotNull Solution solution) {
+        solutions.add(solution);
+    }
 
     private static final AtomicLong counter = new AtomicLong();
 
@@ -20,6 +28,22 @@ public class Solution {
     private @Nullable Integer rightBorder;
 
     private Integer root;
+
+    public Solution(
+            @Nullable Integer firstValue,
+            @Nullable Integer secondValue,
+            @Nullable Integer leftBorder,
+            @Nullable Integer rightBorder
+    ) {
+        this.firstValue = firstValue;
+        this.secondValue = secondValue;
+        this.leftBorder = leftBorder;
+        this.rightBorder = rightBorder;
+
+        checkBorders();
+
+        addToList(this);
+    }
 
     @Nullable public Integer getFirstValue() {
         return firstValue;
@@ -61,31 +85,30 @@ public class Solution {
         this.secondValue = secondValue;
     }
 
-    public Solution() {
-        secondValue = firstValue = rightBorder = leftBorder = root = null;
+    public void checkBorders() {
+        if (leftBorder == null)
+            leftBorder = Integer.MIN_VALUE;
+        if (rightBorder == null)
+            rightBorder = Integer.MAX_VALUE;
     }
 
-    public Solution(
-            @Nullable Integer firstValue,
-            @Nullable Integer secondValue,
-            @Nullable Integer leftBorder,
-            @Nullable Integer rightBorder
-    ) {
-        this.firstValue = firstValue;
-        this.secondValue = secondValue;
-        this.leftBorder = leftBorder;
-        this.rightBorder = rightBorder;
-        this.root = calculateRoot();
+    public @Nullable Integer findInCache() {
+        for (var item : solutions) {
+            if (Objects.equals(item.getFirstValue(), firstValue) &&
+                Objects.equals(item.getSecondValue(), secondValue) &&
+                Objects.equals(item.getLeftBorder(), leftBorder) &&
+                Objects.equals(item.getRightBorder(), rightBorder)
+            ) {
+                return item.getRoot();
+            }
+        }
+        return null;
     }
 
-    private @NotNull Integer calculateRoot() {
+    public void calculateRoot()
+    {
         if (firstValue == null || secondValue == null) {
             throw new IllegalArgumentException("No arguments!");
-        }
-
-        if (leftBorder == null || rightBorder == null) {
-            leftBorder = Integer.MIN_VALUE;
-            rightBorder = Integer.MAX_VALUE;
         }
 
         var temp = secondValue - firstValue;
@@ -94,10 +117,19 @@ public class Solution {
             throw new CalculationException("Solution not found!");
         }
 
-        return temp;
+        root = temp;
     }
 
-    public CalculationResponse getResponse() throws CalculationException {
+    public CalculationResponse getResponse() {
+
+        // searching root in ArrayList
+        root = findInCache();
+
+        // if there is no root then we calculate it
+        if (root == null) {
+            calculateRoot();
+        }
+
         counter.incrementAndGet();
         return new CalculationResponse(counter, root);
     }
