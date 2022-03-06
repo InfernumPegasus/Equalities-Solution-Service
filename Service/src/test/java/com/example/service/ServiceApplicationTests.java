@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,27 +12,32 @@ class ServiceApplicationTests {
 
     @Test
     void isRootEqualToTen() {
-        var root = new Solution(10, 20, 0, 1000)
-                .getResponse()
-                .getRoot();
+        var solution = new Solution(10, 20, 0, 1000);
+        solution.calculateRoot();
 
-        assertThat(root).isEqualTo(10);
+        assertThat(solution.getRoot()).isEqualTo(10);
     }
 
     @Test
-    void isSolutionCanBeFound() {
-        var s1 = new Solution(10, 20, 0, 1000);
-        s1.calculateRoot();
+    void areTwoSameObjectsEqual() {
+        var s1 = new InputParams(10, 20, 199, 399);
+        var s2 = new InputParams(10, 20, 199, 399);
 
-        Solution.addToList(s1);
+        assertThat(s1.equals(s2)).isTrue();
+    }
 
-        assertThat(s1.findInCache()).isEqualTo(10);
+    @Test
+    void areTwoSameObjectsHaveSameHash() {
+        var s1 = new InputParams(10, 20, 199, 399);
+        var s2 = new InputParams(10, 20, 199, 399);
+
+        assert s1.hashCode() == s2.hashCode();
     }
 
     @Test
     void isLeftBorderCorrectIfNull() {
-        var solution = new Solution(10, 20, null, 1000);
+        var params = new InputParams(10, 20, null, 1000);
 
-        assertThat(solution.getLeftBorder()).isEqualTo(Integer.MIN_VALUE);
+        assertThat(params.getLeftBorder()).isEqualTo(Integer.MIN_VALUE);
     }
 }

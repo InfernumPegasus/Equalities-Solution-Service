@@ -20,7 +20,7 @@ public class DefaultAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(@NotNull Exception e) {
-        logger.error("INTERNAL SERVER ERROR", e);
+        logger.error("ERROR CODE 500", e);
         return new ResponseEntity<>(new ExceptionResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

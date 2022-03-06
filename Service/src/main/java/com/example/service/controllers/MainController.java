@@ -1,6 +1,7 @@
 package com.example.service.controllers;
 
 import com.example.service.exceptions.CalculationException;
+import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
 import com.example.service.responses.CalculationResponse;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,11 @@ public class MainController {
             @RequestParam(value="second_border") @Nullable Integer second_border
             ) throws CalculationException {
 
-        Solution solution = new Solution(first_value, second_value, first_border, second_border);
+        var params   = new InputParams(first_value, second_value, first_border, second_border);
+        var solution = new Solution(params);
+
+        solution.calculateRoot();
+        solution.addToList(params);
 
         return new ResponseEntity<>(solution.getResponse(), HttpStatus.OK);
     }
