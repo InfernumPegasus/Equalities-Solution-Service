@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class InputParams {
 
-    // переобределение метода equals()
+    // Method equals() overriding
     @Override
     public boolean equals(Object obj) {
         if (obj == this)
@@ -24,7 +24,7 @@ public class InputParams {
                 Objects.equals(rightBorder, params.rightBorder);
     }
 
-    // переопределение метода hashCode()
+    // Method hashCode() overriding
     @Override
     public int hashCode() {
         return Objects.hash(firstValue, secondValue, leftBorder, rightBorder);
@@ -44,13 +44,18 @@ public class InputParams {
             @Nullable Integer leftBorder,
             @Nullable Integer rightBorder
     ) {
-        if (firstValue == null || secondValue == null)
-            throw new IllegalArgumentException("No arguments!");
+        if (firstValue == null && secondValue == null)
+            throw new IllegalArgumentException("No first and second values");
+
+        if (firstValue == null)
+            throw new IllegalArgumentException("No first value!");
+
+        if (secondValue == null)
+            throw new IllegalArgumentException("No second value!");
 
         this.firstValue  = firstValue;
         this.secondValue = secondValue;
-
-        this.leftBorder = Objects.requireNonNullElse(leftBorder, Integer.MIN_VALUE);
+        this.leftBorder  = Objects.requireNonNullElse(leftBorder, Integer.MIN_VALUE);
         this.rightBorder = Objects.requireNonNullElse(rightBorder, Integer.MAX_VALUE);
     }
 

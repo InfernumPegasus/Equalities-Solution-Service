@@ -1,6 +1,5 @@
 package com.example.service.controllers;
 
-import com.example.service.exceptions.CalculationException;
 import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
 import com.example.service.responses.CalculationResponse;
@@ -20,7 +19,7 @@ public class MainController {
             @RequestParam(value="second_value")  @Nullable Integer second_value,
             @RequestParam(value="first_border")  @Nullable Integer first_border,
             @RequestParam(value="second_border") @Nullable Integer second_border
-            ) throws CalculationException {
+            ) {
 
         var params   = new InputParams(first_value, second_value, first_border, second_border);
         var solution = new Solution(params);
