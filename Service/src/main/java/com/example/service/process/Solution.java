@@ -1,20 +1,16 @@
 package com.example.service.process;
 
 import com.example.service.responses.CalculationResponse;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import static com.example.service.cache.SolutionCache.addToMap;
+import static com.example.service.cache.SolutionCache.findInCache;
 
 public class Solution {
 
     Logger logger = LoggerFactory.getLogger(Solution.class);
-
-    private static final Map<InputParams, Integer> solutions = new HashMap<>();
 
     private final InputParams inputParams;
 
@@ -33,18 +29,6 @@ public class Solution {
         inputParams = new InputParams(firstValue, secondValue, leftBorder, rightBorder);
     }
 
-    public void addToList(@NotNull InputParams params) {
-        if (!solutions.containsKey(params))
-            solutions.put(params, root);
-    }
-
-    public static @Nullable Integer findInCache(@NotNull InputParams params) {
-        if (solutions.containsKey(params))
-            return solutions.get(params);
-
-        return null;
-    }
-
     public void calculateRoot() {
         // Trying to find root in cache
         var temp = findInCache(inputParams);
@@ -60,11 +44,13 @@ public class Solution {
 
         temp = inputParams.getSecondValue() - inputParams.getFirstValue();
 
-        if (temp < inputParams.getLeftBorder() || temp > inputParams.getRightBorder()) {
+        if (temp < inputParams.getLeftBorder() || temp > inputParams.getRightBorder())
             throw new ArithmeticException("Root is not in range!");
-        }
 
         root = temp;
+
+        // Adding { inputParams, root } to cache
+        addToMap(inputParams, root);
     }
 
     public CalculationResponse getResponse() {

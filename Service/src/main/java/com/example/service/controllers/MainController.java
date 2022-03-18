@@ -25,7 +25,6 @@ public class MainController {
         var solution = new Solution(params);
 
         solution.calculateRoot();
-        solution.addToList(params);
 
         return new ResponseEntity<>(solution.getResponse(), HttpStatus.OK);
     }
