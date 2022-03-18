@@ -1,5 +1,6 @@
 package com.example.service.controllers;
 
+import com.example.service.cache.SolutionCache;
 import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
 import com.example.service.responses.CalculationResponse;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MainController {
 
     @GetMapping("/solve")
-    public ResponseEntity<CalculationResponse> GetAnswer(
+    public ResponseEntity<CalculationResponse> getAnswer(
             @RequestParam(value="first_value")   @Nullable Integer first_value,
             @RequestParam(value="second_value")  @Nullable Integer second_value,
             @RequestParam(value="first_border")  @Nullable Integer first_border,
@@ -27,5 +28,12 @@ public class MainController {
         solution.calculateRoot();
 
         return new ResponseEntity<>(solution.getResponse(), HttpStatus.OK);
+    }
+
+    @GetMapping("/cache")
+    public ResponseEntity<String> printCache() {
+        var cache = SolutionCache.getCache();
+
+        return new ResponseEntity<>(cache, HttpStatus.OK);
     }
 }

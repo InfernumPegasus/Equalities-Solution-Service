@@ -28,7 +28,7 @@ public class DefaultAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {ArithmeticException.class})
     public ResponseEntity<ExceptionResponse> handleException(@NotNull ArithmeticException e) {
-        logger.error("Error while calculating:\n", e);
+        logger.error("Error while calculating:", e);
         return new ResponseEntity<>(new ExceptionResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
