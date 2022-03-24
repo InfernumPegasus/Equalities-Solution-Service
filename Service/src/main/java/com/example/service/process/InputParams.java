@@ -1,8 +1,8 @@
 package com.example.service.process;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.Nullable;
-
 import java.util.Objects;
 
 public class InputParams {
@@ -45,7 +45,7 @@ public class InputParams {
             @Nullable Integer rightBorder
     ) {
         if (firstValue == null && secondValue == null)
-            throw new IllegalArgumentException("No first and second values");
+            throw new IllegalArgumentException("No first and second values!");
 
         if (firstValue == null)
             throw new IllegalArgumentException("No first value!");
@@ -55,29 +55,33 @@ public class InputParams {
 
         this.firstValue  = firstValue;
         this.secondValue = secondValue;
-        this.leftBorder  = Objects.requireNonNullElse(leftBorder, Integer.MIN_VALUE);
+        this.leftBorder  = Objects.requireNonNullElse(leftBorder,  Integer.MIN_VALUE);
         this.rightBorder = Objects.requireNonNullElse(rightBorder, Integer.MAX_VALUE);
     }
 
     @NotNull
+    @Contract(pure = true)
     public Integer getFirstValue() {
         assert firstValue != null;
         return firstValue;
     }
 
     @NotNull
+    @Contract(pure = true)
     public Integer getSecondValue() {
         assert secondValue != null;
         return secondValue;
     }
 
     @NotNull
+    @Contract(pure = true)
     public Integer getLeftBorder() {
         assert leftBorder != null;
         return leftBorder;
     }
 
     @NotNull
+    @Contract(pure = true)
     public Integer getRightBorder() {
         assert rightBorder != null;
         return rightBorder;

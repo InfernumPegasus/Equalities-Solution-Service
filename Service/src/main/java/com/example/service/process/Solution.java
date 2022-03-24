@@ -1,16 +1,9 @@
 package com.example.service.process;
 
-import com.example.service.responses.CalculationResponse;
+import com.example.service.cache.SolutionCache;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static com.example.service.cache.SolutionCache.addToMap;
-import static com.example.service.cache.SolutionCache.findInCache;
 
 public class Solution {
-
-    Logger logger = LoggerFactory.getLogger(Solution.class);
 
     private final InputParams inputParams;
 
@@ -31,30 +24,23 @@ public class Solution {
 
     public void calculateRoot() {
         // Trying to find root in cache
-        var temp = findInCache(inputParams);
+        var temp = SolutionCache.find(inputParams);
         if (temp != null) {
-            logger.info("Root found in cache!");
+            setRoot(temp);
 
-            root = temp;
             return;
         }
 
         // If not found
-        logger.info("Calculating root...");
-
         temp = inputParams.getSecondValue() - inputParams.getFirstValue();
 
         if (temp < inputParams.getLeftBorder() || temp > inputParams.getRightBorder())
             throw new ArithmeticException("Root is not in range!");
 
-        root = temp;
+        setRoot(temp);
 
         // Adding { inputParams, root } to cache
-        addToMap(inputParams, root);
-    }
-
-    public CalculationResponse getResponse() {
-        return new CalculationResponse(root);
+        SolutionCache.add(inputParams, root);
     }
 
     public Integer getRoot() {
