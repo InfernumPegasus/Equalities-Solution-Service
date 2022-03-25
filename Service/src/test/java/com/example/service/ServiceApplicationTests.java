@@ -12,7 +12,8 @@ class ServiceApplicationTests {
 
     @Test
     void isRootEqualToTen() {
-        var solution = new Solution(10, 20, 0, 1000);
+        var solution = new Solution(
+                new InputParams(10, 20, 0, 1000));
         solution.calculateRoot();
 
         assertThat(solution.getRoot()).isEqualTo(10);
