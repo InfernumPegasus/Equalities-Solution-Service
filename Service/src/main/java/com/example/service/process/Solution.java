@@ -18,7 +18,6 @@ public class Solution {
     public Solution(InputParams params) {
         var context = new AnnotationConfigApplicationContext(SpringConfig.class);
         cache = context.getBean("cache", SolutionCache.class);
-        MyLogger.log(Level.WARN, "SOLUTION C-TOR!!!");
         context.close();
 
         this.inputParams = params;
