@@ -31,6 +31,12 @@ public class DefaultAdvice extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(value = {IllegalArgumentException.class})
+    public ResponseEntity<Object> handleException(@NotNull IllegalArgumentException e) {
+        logger.error("Null argument");
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     /*Other Exceptions handler*/
 
     @ExceptionHandler(Exception.class)

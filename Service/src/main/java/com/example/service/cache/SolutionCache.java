@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.example.service.logger.MyLogger;
 
+import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,17 +31,13 @@ public class SolutionCache {
     }
 
     @Contract(pure = true)
-    public @NotNull String getStringCache() {
+    public static @NotNull String getStringCache() {
         return ("Cache:\n" + solutions);
     }
 
-    @Contract(pure = true)
-    public static @NotNull String getStaticStringCache() {
-        return ("Cache:\n" + solutions);
-    }
-
-    @Contract(pure = true)
-    public Map<InputParams, Integer> getSolutions() {
-        return solutions;
+    @PreDestroy
+    void preDestroy() {
+        solutions.clear();
+        MyLogger.log(Level.WARN, "Solution cache: map destroyed!");
     }
 }

@@ -30,13 +30,13 @@ public class InputParams {
         return Objects.hash(firstValue, secondValue, leftBorder, rightBorder);
     }
 
-    private @Nullable Integer firstValue;
+    private final @Nullable Integer firstValue;
 
-    private @Nullable Integer secondValue;
+    private final @Nullable Integer secondValue;
 
-    private @Nullable Integer leftBorder;
+    private final @Nullable Integer leftBorder;
 
-    private @Nullable Integer rightBorder;
+    private final @Nullable Integer rightBorder;
 
     public InputParams(
             @Nullable Integer firstValue,
@@ -85,21 +85,5 @@ public class InputParams {
     public Integer getRightBorder() {
         assert rightBorder != null;
         return rightBorder;
-    }
-
-    public void setFirstValue(@Nullable Integer firstValue) {
-        this.firstValue = firstValue;
-    }
-
-    public void setSecondValue(@Nullable Integer secondValue) {
-        this.secondValue = secondValue;
-    }
-
-    public void setLeftBorder(@Nullable Integer leftBorder) {
-        this.leftBorder = leftBorder;
-    }
-
-    public void setRightBorder(@Nullable Integer rightBorder) {
-        this.rightBorder = rightBorder;
     }
 }

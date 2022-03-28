@@ -1,56 +1,42 @@
 package com.example.service.process;
 
-import com.example.service.SpringConfig;
 import com.example.service.cache.SolutionCache;
 import com.example.service.logger.MyLogger;
 import org.apache.logging.log4j.Level;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import static com.example.service.controllers.MainController.context;
 
 public class Solution {
 
-    private final SolutionCache cache;
+    private static final SolutionCache cache =
+            context.getBean("cache", SolutionCache.class);
 
-    private final InputParams inputParams;
+    private static @Nullable Integer root;
 
-    private Integer root;
-
-    public Solution(InputParams params) {
-        var context = new AnnotationConfigApplicationContext(SpringConfig.class);
-        cache = context.getBean("cache", SolutionCache.class);
-        context.close();
-
-        this.inputParams = params;
-    }
-
-    public void calculateRoot() {
+    public static void calculateRoot(@NotNull InputParams inputParams) {
         // Trying to find root in cache
-        var temp = cache.find(inputParams);
-        if (temp != null) {
-            MyLogger.log(Level.WARN, "Value found in cache!");
-            setRoot(temp);
+        root = cache.find(inputParams);
 
-            return;
+        if (root != null) {
+            MyLogger.log(Level.WARN, "Value " + root + " found in cache!");
+        } else {
+            // If not found
+            root = inputParams.getSecondValue() - inputParams.getFirstValue();
+
+            if (root < inputParams.getLeftBorder() || root > inputParams.getRightBorder())
+                throw new ArithmeticException("Root " + root + " is not in range!");
+
+            // Adding { inputParams, root } to cache
+            cache.add(inputParams, root);
         }
-
-        // If not found
-        temp = inputParams.getSecondValue() - inputParams.getFirstValue();
-
-        if (temp < inputParams.getLeftBorder() || temp > inputParams.getRightBorder())
-            throw new ArithmeticException("Root is not in range!");
-
-        setRoot(temp);
-
-        // Adding { inputParams, root } to cache
-        cache.add(inputParams, root);
     }
 
-    public Integer getRoot() {
+    @Contract(pure = true)
+    public static @NotNull Integer getRoot() {
+        assert root != null;
         return root;
     }
-
-    public void setRoot(@Nullable Integer root) {
-        this.root = root;
-    }
-
 }

@@ -1,8 +1,10 @@
 package com.example.service.controllers;
 
+import com.example.service.SpringConfig;
 import com.example.service.cache.SolutionCache;
 import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MainController {
 
+    public static AnnotationConfigApplicationContext context =
+            new AnnotationConfigApplicationContext(SpringConfig.class);
+
     @GetMapping("/solve")
     public ResponseEntity<Object> solve(
             @RequestParam(value="first_value")   @Nullable Integer first_value,
@@ -21,15 +26,14 @@ public class MainController {
             @RequestParam(value="second_border") @Nullable Integer second_border
             ) {
 
-        var solution = new Solution(new InputParams(first_value, second_value, first_border, second_border));
+        var params = new InputParams(first_value, second_value, first_border, second_border);
+        Solution.calculateRoot(params);
 
-        solution.calculateRoot();
-
-        return new ResponseEntity<>(solution.getRoot(), HttpStatus.OK);
+        return new ResponseEntity<>(Solution.getRoot(), HttpStatus.OK);
     }
 
     @GetMapping("/cache")
     public ResponseEntity<String> printCache() {
-        return new ResponseEntity<>(SolutionCache.getStaticStringCache(), HttpStatus.OK);
+        return new ResponseEntity<>(SolutionCache.getStringCache(), HttpStatus.OK);
     }
 }
