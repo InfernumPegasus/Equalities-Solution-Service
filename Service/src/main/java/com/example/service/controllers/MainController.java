@@ -1,6 +1,7 @@
 package com.example.service.controllers;
 
 import com.example.service.SpringConfig;
+import com.example.service.async.Counter;
 import com.example.service.cache.SolutionCache;
 import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
@@ -18,6 +19,9 @@ public class MainController {
     public static AnnotationConfigApplicationContext context =
             new AnnotationConfigApplicationContext(SpringConfig.class);
 
+    private static final Counter counter =
+            context.getBean("counter", Counter.class);
+
     @GetMapping("/solve")
     public ResponseEntity<Object> solve(
             @RequestParam(value="first_value")   @Nullable Integer first_value,
@@ -25,6 +29,8 @@ public class MainController {
             @RequestParam(value="first_border")  @Nullable Integer first_border,
             @RequestParam(value="second_border") @Nullable Integer second_border
             ) {
+
+        counter.increase();
 
         var params = new InputParams(first_value, second_value, first_border, second_border);
         Solution.calculateRoot(params);
@@ -34,6 +40,16 @@ public class MainController {
 
     @GetMapping("/cache")
     public ResponseEntity<String> printCache() {
+        counter.increase();
+
         return new ResponseEntity<>(SolutionCache.getStringCache(), HttpStatus.OK);
+    }
+
+    @GetMapping("/counter")
+    public ResponseEntity<String> printCounter() {
+        counter.increase();
+
+        var response = "Requests count: " + counter.getCount();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

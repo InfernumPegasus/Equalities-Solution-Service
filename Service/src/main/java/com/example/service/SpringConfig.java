@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.service.async.Counter;
 import com.example.service.cache.SolutionCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,12 @@ public class SpringConfig {
     @Scope(value = "singleton")
     SolutionCache cache() {
         return new SolutionCache();
+    }
+
+    @Bean("counter")
+    @Scope(value = "singleton")
+    Counter counterService() {
+        return new Counter();
     }
 
 }
