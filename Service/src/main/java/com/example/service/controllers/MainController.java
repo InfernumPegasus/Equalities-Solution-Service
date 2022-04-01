@@ -40,15 +40,11 @@ public class MainController {
 
     @GetMapping("/cache")
     public ResponseEntity<String> printCache() {
-        counter.increase();
-
         return new ResponseEntity<>(SolutionCache.getStringCache(), HttpStatus.OK);
     }
 
     @GetMapping("/counter")
     public ResponseEntity<String> printCounter() {
-        counter.increase();
-
         var response = "Requests count: " + counter.getCount();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
