@@ -2,9 +2,13 @@ package com.example.service;
 
 import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.LinkedList;
+
+import static com.jayway.jsonpath.internal.function.ParamType.JSON;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
@@ -38,5 +42,27 @@ class ServiceApplicationTests {
         var params = new InputParams(10, 20, null, 1000);
 
         assertThat(params.getLeftBorder()).isEqualTo(Integer.MIN_VALUE);
+    }
+
+    @Test
+    void bulkOperationsCounter() {
+
+        var params = new LinkedList<InputParams>();
+
+        var s1 = new InputParams(10, 645, null, null);
+        var s2 = new InputParams(10, 45, null, null);
+        var s3 = new InputParams(56, 20, null, null);
+
+        params.add(s1);
+        params.add(s2);
+        params.add(s3);
+
+        var count = params
+                .stream()
+                .filter(p -> p.getFirstValue() >= 10 && p.getSecondValue() <= 1000)
+                .count();
+
+        assert count == 3;
+
     }
 }

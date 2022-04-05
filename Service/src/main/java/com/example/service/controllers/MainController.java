@@ -2,7 +2,7 @@ package com.example.service.controllers;
 
 import com.example.service.SpringConfig;
 import com.example.service.async.Counter;
-import com.example.service.cache.SolutionCache;
+import com.example.service.cache.Cache;
 import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -12,6 +12,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedList;
+import java.util.List;
 
 @RestController
 public class MainController {
@@ -40,7 +43,7 @@ public class MainController {
 
     @GetMapping("/cache")
     public ResponseEntity<String> printCache() {
-        return new ResponseEntity<>(SolutionCache.getStringCache(), HttpStatus.OK);
+        return new ResponseEntity<>(Cache.getStringCache(), HttpStatus.OK);
     }
 
     @GetMapping("/counter")

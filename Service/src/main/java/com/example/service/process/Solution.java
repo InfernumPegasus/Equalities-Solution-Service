@@ -1,6 +1,6 @@
 package com.example.service.process;
 
-import com.example.service.cache.SolutionCache;
+import com.example.service.cache.Cache;
 import com.example.service.logger.MyLogger;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.Contract;
@@ -11,8 +11,8 @@ import static com.example.service.controllers.MainController.context;
 
 public class Solution {
 
-    private static final SolutionCache cache =
-            context.getBean("cache", SolutionCache.class);
+    private static final Cache cache =
+            context.getBean("cache", Cache.class);
 
     private static @Nullable Integer root;
 

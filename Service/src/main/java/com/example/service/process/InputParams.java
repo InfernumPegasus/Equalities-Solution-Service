@@ -30,6 +30,17 @@ public class InputParams {
         return Objects.hash(firstValue, secondValue, leftBorder, rightBorder);
     }
 
+    // Method toString() overriding
+    @Override
+    public String toString() {
+        return "InputParams{" +
+                "firstValue=" + firstValue +
+                ", secondValue=" + secondValue +
+                ", leftBorder=" + leftBorder +
+                ", rightBorder=" + rightBorder +
+                '}';
+    }
+
     private final @Nullable Integer firstValue;
 
     private final @Nullable Integer secondValue;

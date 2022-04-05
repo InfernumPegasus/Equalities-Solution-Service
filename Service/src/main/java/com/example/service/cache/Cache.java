@@ -11,14 +11,15 @@ import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SolutionCache {
+public class Cache {
 
     private static final Map<InputParams, Integer> solutions = new HashMap<>();
 
-    public void add(@NotNull InputParams params, @NotNull Integer root) {
+    public void add(@NotNull InputParams params,
+                    @NotNull Integer root) {
         if (!solutions.containsKey(params)) {
             solutions.put(params, root);
-            MyLogger.log(Level.INFO, "Value " + params + "@" + root + " added to cache!");
+            MyLogger.log(Level.INFO, "Value " + params + "@root=" + root + " added to cache!");
         }
     }
 
@@ -38,6 +39,6 @@ public class SolutionCache {
     @PreDestroy
     void preDestroy() {
         solutions.clear();
-        MyLogger.log(Level.WARN, "Solution cache: map destroyed!");
+        MyLogger.log(Level.WARN, "Cache: map destroyed!");
     }
 }
