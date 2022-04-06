@@ -1,17 +1,12 @@
 package com.example.service.async;
 
 import com.example.service.logger.MyLogger;
+import lombok.Getter;
 import org.apache.logging.log4j.Level;
-import org.jetbrains.annotations.Contract;
 
 public class Counter {
 
-    private long count;
-
-    @Contract(pure = true)
-    public long getCount() {
-        return count;
-    }
+    @Getter private long count;
 
     public synchronized void increase() {
         count++;
