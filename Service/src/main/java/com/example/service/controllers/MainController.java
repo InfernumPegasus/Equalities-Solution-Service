@@ -5,15 +5,18 @@ import com.example.service.async.Counter;
 import com.example.service.cache.Cache;
 import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -39,6 +42,33 @@ public class MainController {
         Solution.calculateRoot(params);
 
         return new ResponseEntity<>(Solution.getRoot(), HttpStatus.OK);
+    }
+
+    @PostMapping("/solve_json")
+    public ResponseEntity<Object> solveSingleJson(
+            @RequestBody @NotNull InputParams param
+    ) {
+        counter.increase();
+        Solution.calculateRoot(param);
+
+        return new ResponseEntity<>(Solution.getRoot(), HttpStatus.OK);
+    }
+
+    @PostMapping("/solve_bulk")
+    public ResponseEntity<Object> solveBulkJson(
+            @RequestBody @NotNull List<InputParams> params
+    ) {
+
+        var roots = new ArrayList<Integer>();
+
+        for (var param : params) {
+            counter.increase();
+
+            Solution.calculateRoot(param);
+            roots.add(Solution.getRoot());
+        }
+
+        return new ResponseEntity<>(roots, HttpStatus.OK);
     }
 
     @GetMapping("/cache")
