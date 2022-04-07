@@ -2,13 +2,10 @@ package com.example.service;
 
 import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import java.util.LinkedList;
 
-import static com.jayway.jsonpath.internal.function.ParamType.JSON;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
@@ -62,7 +59,7 @@ class ServiceApplicationTests {
                 .filter(p -> p.getFirstValue() >= 10 && p.getSecondValue() <= 1000)
                 .count();
 
-        assert count == 3;
+        assert count == params.size();
 
     }
 }

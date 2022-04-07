@@ -1,7 +1,6 @@
 package com.example.service.controllers;
 
 import com.example.service.SpringConfig;
-import com.example.service.async.Counter;
 import com.example.service.cache.Cache;
 import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
@@ -15,18 +14,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.example.service.process.Solution.counter;
 
 @RestController
 public class MainController {
 
     public static AnnotationConfigApplicationContext context =
             new AnnotationConfigApplicationContext(SpringConfig.class);
-
-    private static final Counter counter =
-            context.getBean("counter", Counter.class);
 
     @GetMapping("/solve")
     public ResponseEntity<Object> solve(
@@ -35,8 +32,6 @@ public class MainController {
             @RequestParam(value="first_border")  @Nullable Integer first_border,
             @RequestParam(value="second_border") @Nullable Integer second_border
             ) {
-
-        counter.increase();
 
         var params = new InputParams(first_value, second_value, first_border, second_border);
         Solution.calculateRoot(params);
@@ -48,7 +43,6 @@ public class MainController {
     public ResponseEntity<Object> solveSingleJson(
             @RequestBody @NotNull InputParams param
     ) {
-        counter.increase();
         Solution.calculateRoot(param);
 
         return new ResponseEntity<>(Solution.getRoot(), HttpStatus.OK);
@@ -59,14 +53,11 @@ public class MainController {
             @RequestBody @NotNull List<InputParams> params
     ) {
 
-        var roots = new ArrayList<Integer>();
-
-        for (var param : params) {
-            counter.increase();
-
-            Solution.calculateRoot(param);
-            roots.add(Solution.getRoot());
-        }
+        var roots = params
+                .stream()
+                .peek(Solution::calculateRoot)
+                .map(e -> Solution.getRoot())
+                .collect(Collectors.toList());
 
         return new ResponseEntity<>(roots, HttpStatus.OK);
     }

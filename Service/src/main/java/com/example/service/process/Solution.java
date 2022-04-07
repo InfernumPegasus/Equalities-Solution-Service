@@ -1,7 +1,9 @@
 package com.example.service.process;
 
+import com.example.service.async.Counter;
 import com.example.service.cache.Cache;
 import com.example.service.logger.MyLogger;
+import lombok.Getter;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -11,25 +13,36 @@ import static com.example.service.controllers.MainController.context;
 
 public class Solution {
 
+    @Getter
+    public static final Counter counter =
+            context.getBean("counter", Counter.class);
+
     private static final Cache cache =
             context.getBean("cache", Cache.class);
 
     private static @Nullable Integer root;
 
     public static void calculateRoot(@NotNull InputParams inputParams) {
-        // Trying to find root in cache
-        root = cache.find(inputParams);
+        // Increasing requests counter
+        counter.increase();
 
-        if (root != null) {
+        // Trying to find root in cache
+        var found = cache.find(inputParams);
+
+        if (found != null) {
+            root = found;
             MyLogger.log(Level.WARN, "Value " + root + " found in cache!");
         } else {
             // If not found
-            root = inputParams.getSecondValue() - inputParams.getFirstValue();
+            found = inputParams.getSecondValue() - inputParams.getFirstValue();
 
-            if (root < inputParams.getLeftBorder() || root > inputParams.getRightBorder())
-                throw new ArithmeticException("Root " + root + " is not in range!");
+            if (found < inputParams.getLeftBorder() || found > inputParams.getRightBorder())
+                throw new ArithmeticException(
+                                "Root " + found + " is not in range from " + inputParams.getLeftBorder() +
+                                " and " + inputParams.getRightBorder());
 
             // Adding { inputParams, root } to cache
+            root = found;
             cache.add(inputParams, root);
         }
     }
