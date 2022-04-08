@@ -2,6 +2,7 @@ package com.example.service.controllers;
 
 import com.example.service.SpringConfig;
 import com.example.service.cache.Cache;
+import com.example.service.stats.ServiceStats;
 import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,7 @@ public class MainController {
 
         var params = new InputParams(first_value, second_value, first_border, second_border);
         Solution.calculateRoot(params);
+        ServiceStats.add(Solution.getRoot());
 
         return new ResponseEntity<>(Solution.getRoot(), HttpStatus.OK);
     }
@@ -44,6 +46,7 @@ public class MainController {
             @RequestBody @NotNull InputParams param
     ) {
         Solution.calculateRoot(param);
+        ServiceStats.add(Solution.getRoot());
 
         return new ResponseEntity<>(Solution.getRoot(), HttpStatus.OK);
     }
@@ -59,6 +62,14 @@ public class MainController {
                 .map(e -> Solution.getRoot())
                 .collect(Collectors.toList());
 
+        roots.stream()
+                .peek(ServiceStats::add)
+                .close();
+
+        for (var i : roots) {
+            ServiceStats.add(i);
+        }
+
         return new ResponseEntity<>(roots, HttpStatus.OK);
     }
 
@@ -71,5 +82,10 @@ public class MainController {
     public ResponseEntity<String> printCounter() {
         var response = "Requests count: " + counter.getCount();
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("stats")
+    public ResponseEntity<Object> printStats() {
+        return new ResponseEntity<>(ServiceStats.getStats(), HttpStatus.OK);
     }
 }

@@ -1,7 +1,7 @@
 package com.example.service.process;
 
-import com.example.service.async.Counter;
 import com.example.service.cache.Cache;
+import com.example.service.stats.ServiceStats;
 import com.example.service.logger.MyLogger;
 import lombok.Getter;
 import org.apache.logging.log4j.Level;
@@ -25,6 +25,7 @@ public class Solution {
     public static void calculateRoot(@NotNull InputParams inputParams) {
         // Increasing requests counter
         counter.increase();
+        ServiceStats.increaseTotalRequests();
 
         // Trying to find root in cache
         var found = cache.find(inputParams);
@@ -36,10 +37,14 @@ public class Solution {
             // If not found
             found = inputParams.getSecondValue() - inputParams.getFirstValue();
 
-            if (found < inputParams.getLeftBorder() || found > inputParams.getRightBorder())
+            if (found < inputParams.getLeftBorder() || found > inputParams.getRightBorder()) {
+                // Increasing wrong requests counter
+                ServiceStats.increaseWrongRequests();
+
                 throw new ArithmeticException(
-                                "Root " + found + " is not in range from " + inputParams.getLeftBorder() +
+                        "Root " + found + " is not in range from " + inputParams.getLeftBorder() +
                                 " and " + inputParams.getRightBorder());
+            }
 
             // Adding { inputParams, root } to cache
             root = found;

@@ -1,6 +1,6 @@
 package com.example.service;
 
-import com.example.service.async.Counter;
+import com.example.service.process.Counter;
 import com.example.service.cache.Cache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
