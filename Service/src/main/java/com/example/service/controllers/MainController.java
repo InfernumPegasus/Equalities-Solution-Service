@@ -66,10 +66,6 @@ public class MainController {
                 .peek(ServiceStats::add)
                 .close();
 
-        for (var i : roots) {
-            ServiceStats.add(i);
-        }
-
         return new ResponseEntity<>(roots, HttpStatus.OK);
     }
 
