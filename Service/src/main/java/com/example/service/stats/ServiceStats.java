@@ -20,6 +20,8 @@ public class ServiceStats {
 
     private static List<Integer> roots = new ArrayList<>();
 
+    private static boolean shouldBeRecalculated = true;
+
     private static Long totalRequests = 0L;
     private static Long wrongRequests = 0L;
 
@@ -40,27 +42,28 @@ public class ServiceStats {
 
         MyLogger.log(Level.INFO, "Collecting stats...");
 
-        mostPopular = roots
-                .stream()
-                .reduce(
-                        BinaryOperator.maxBy(Comparator.comparingInt(o -> Collections.frequency(roots, o)))
-                ).orElseThrow(IllegalStateException::new);
+        if (shouldBeRecalculated) {
 
-        roots = roots
-                .stream()
-                .distinct()
-                .collect(Collectors.toList());
+            mostPopular = roots
+                    .stream()
+                    .reduce(
+                            BinaryOperator.maxBy(Comparator.comparingInt(o -> Collections.frequency(roots, o)))
+                    ).orElse(0);
 
-        min = roots
-                .stream()
-                .min(Comparator.comparing(Long::valueOf))
-                .orElseThrow(IllegalStateException::new);
+            roots = roots
+                    .stream()
+                    .distinct()
+                    .sorted()
+                    .collect(Collectors.toList());
 
-        max = roots
-                .stream()
-                .max(Comparator.comparing(Long::valueOf))
-                .orElseThrow(IllegalStateException::new);
+            min = roots.stream().min(Comparator.comparing(Long::valueOf)).orElse(0);
+            max = roots.stream().max(Comparator.comparing(Long::valueOf)).orElse(0);
 
+            MyLogger.log(Level.WARN, "Stats recollected!");
+
+            shouldBeRecalculated = false;
+
+        }
     }
 
     public static @NotNull Map<String, Long> getStats() {
@@ -79,5 +82,6 @@ public class ServiceStats {
 
     public static void add(@NotNull Integer root) {
         roots.add(root);
+        shouldBeRecalculated = true;
     }
 }
