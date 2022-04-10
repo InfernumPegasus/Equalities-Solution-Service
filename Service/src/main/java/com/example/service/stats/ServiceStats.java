@@ -5,13 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
@@ -43,7 +41,6 @@ public class ServiceStats {
         MyLogger.log(Level.INFO, "Collecting stats...");
 
         if (shouldBeRecalculated) {
-
             mostPopular = roots
                     .stream()
                     .reduce(
@@ -56,17 +53,23 @@ public class ServiceStats {
                     .sorted()
                     .collect(Collectors.toList());
 
-            min = roots.stream().min(Comparator.comparing(Long::valueOf)).orElse(0);
-            max = roots.stream().max(Comparator.comparing(Long::valueOf)).orElse(0);
+            min = roots
+                    .stream()
+                    .min(Comparator.comparing(Long::valueOf))
+                    .orElse(0);
+
+            max = roots
+                    .stream()
+                    .max(Comparator.comparing(Long::valueOf))
+                    .orElse(0);
 
             MyLogger.log(Level.WARN, "Stats recollected!");
 
             shouldBeRecalculated = false;
-
         }
     }
 
-    public static @NotNull Map<String, Long> getStats() {
+    public static @NotNull HashMap<String, Long> getStats() {
         countAllParams();
 
         var stats = new HashMap<String, Long>();

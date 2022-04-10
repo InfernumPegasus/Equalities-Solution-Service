@@ -6,10 +6,10 @@ import com.example.service.stats.ServiceStats;
 import com.example.service.process.InputParams;
 import com.example.service.process.Solution;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -60,11 +60,8 @@ public class MainController {
                 .stream()
                 .peek(Solution::calculateRoot)
                 .map(e -> Solution.getRoot())
-                .collect(Collectors.toList());
-
-        roots.stream()
                 .peek(ServiceStats::add)
-                .close();
+                .collect(Collectors.toList());
 
         return new ResponseEntity<>(roots, HttpStatus.OK);
     }
@@ -80,7 +77,7 @@ public class MainController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("stats")
+    @GetMapping("/stats")
     public ResponseEntity<Object> printStats() {
         return new ResponseEntity<>(ServiceStats.getStats(), HttpStatus.OK);
     }
