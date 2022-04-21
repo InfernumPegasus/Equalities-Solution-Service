@@ -1,9 +1,11 @@
 package com.example.service;
 
 import com.example.service.process.InputParams;
-import com.example.service.process.Solution;
+import com.example.service.services.Solution;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
 import java.util.LinkedList;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -11,11 +13,17 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest
 class ServiceApplicationTests {
 
+    public static AnnotationConfigApplicationContext context =
+            new AnnotationConfigApplicationContext(SpringConfig.class);
+
+    private static final Solution solution =
+            context.getBean("solution", Solution.class);
+
     @Test
     void isRootEqualToTen() {
-        Solution.calculateRoot(new InputParams(10, 20, 0, 1000));
+        solution.calculateRoot(new InputParams(10, 20, null, null));
 
-        assertThat(Solution.getRoot()).isEqualTo(10);
+        assertThat(solution.getRoot()).isEqualTo(10);
     }
 
     @Test

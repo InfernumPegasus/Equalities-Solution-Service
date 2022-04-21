@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = "15"
 
 repositories {
     mavenCentral()
@@ -20,8 +20,11 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation 'org.hibernate:hibernate-core:6.0.0.Final'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+targetCompatibility = JavaVersion.VERSION_15

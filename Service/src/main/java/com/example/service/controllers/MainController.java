@@ -1,12 +1,11 @@
 package com.example.service.controllers;
 
 import com.example.service.SpringConfig;
-import com.example.service.cache.Cache;
+import com.example.service.services.Cache;
 import com.example.service.stats.ServiceStats;
 import com.example.service.process.InputParams;
-import com.example.service.process.Solution;
+import com.example.service.services.Solution;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,37 +17,45 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.service.process.Solution.counter;
-
 @RestController
 public class MainController {
 
     public static AnnotationConfigApplicationContext context =
             new AnnotationConfigApplicationContext(SpringConfig.class);
 
+    private static final Solution solution =
+            context.getBean("solution", Solution.class);
+
     @GetMapping("/solve")
     public ResponseEntity<Object> solve(
-            @RequestParam(value="first_value")   @Nullable Integer first_value,
-            @RequestParam(value="second_value")  @Nullable Integer second_value,
-            @RequestParam(value="first_border")  @Nullable Integer first_border,
-            @RequestParam(value="second_border") @Nullable Integer second_border
+            @RequestParam(value="first_value")   Integer first_value,
+            @RequestParam(value="second_value")  Integer second_value,
+            @RequestParam(value="first_border")  Integer first_border,
+            @RequestParam(value="second_border") Integer second_border
             ) {
 
         var params = new InputParams(first_value, second_value, first_border, second_border);
-        Solution.calculateRoot(params);
-        ServiceStats.add(Solution.getRoot());
+        if (!Solution.isCorrectParams(params)) {
+            throw new RuntimeException("Wrong params!");
+        }
+        solution.calculateRoot(params);
+        ServiceStats.add(solution.getRoot());
 
-        return new ResponseEntity<>(Solution.getRoot(), HttpStatus.OK);
+        return new ResponseEntity<>(solution.getResponse(), HttpStatus.OK);
     }
 
     @PostMapping("/solve_json")
     public ResponseEntity<Object> solveSingleJson(
-            @RequestBody @NotNull InputParams param
+            @RequestBody InputParams param
     ) {
-        Solution.calculateRoot(param);
-        ServiceStats.add(Solution.getRoot());
+        if (!Solution.isCorrectParams(param)) {
+            throw new RuntimeException("Wrong params!");
+        }
 
-        return new ResponseEntity<>(Solution.getRoot(), HttpStatus.OK);
+        solution.calculateRoot(param);
+        ServiceStats.add(solution.getRoot());
+
+        return new ResponseEntity<>(solution.getResponse(), HttpStatus.OK);
     }
 
     @PostMapping("/solve_bulk")
@@ -58,8 +65,9 @@ public class MainController {
 
         var roots = params
                 .stream()
-                .peek(Solution::calculateRoot)
-                .map(e -> Solution.getRoot())
+                .filter(Solution::isCorrectParams)
+                .peek(solution::calculateRoot)
+                .map(e -> solution.getRoot())
                 .peek(ServiceStats::add)
                 .collect(Collectors.toList());
 
@@ -73,7 +81,7 @@ public class MainController {
 
     @GetMapping("/counter")
     public ResponseEntity<String> printCounter() {
-        var response = "Requests count: " + counter.getCount();
+        var response = "Requests count: " + solution.getCount();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

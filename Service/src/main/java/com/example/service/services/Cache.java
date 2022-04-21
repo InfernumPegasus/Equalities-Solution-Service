@@ -1,4 +1,4 @@
-package com.example.service.cache;
+package com.example.service.services;
 
 import com.example.service.process.InputParams;
 import org.apache.logging.log4j.Level;
@@ -6,11 +6,13 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.example.service.logger.MyLogger;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.Map;
 
+@Service
 public class Cache {
 
     private static final Map<InputParams, Integer> solutions = new HashMap<>();
@@ -19,7 +21,11 @@ public class Cache {
                     @NotNull Integer root) {
         if (!solutions.containsKey(params)) {
             solutions.put(params, root);
-            MyLogger.log(Level.INFO, "Value " + params + "@root=" + root + " added to cache!");
+            var message = """
+            Value %s@root= %d added to cache!
+            """.formatted(params, root);
+
+            MyLogger.log(Level.INFO, message);
         }
     }
 

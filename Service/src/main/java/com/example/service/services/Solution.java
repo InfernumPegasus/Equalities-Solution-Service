@@ -1,6 +1,7 @@
-package com.example.service.process;
+package com.example.service.services;
 
-import com.example.service.cache.Cache;
+import com.example.service.process.InputParams;
+import com.example.service.responses.Response;
 import com.example.service.stats.ServiceStats;
 import com.example.service.logger.MyLogger;
 import lombok.Getter;
@@ -8,21 +9,25 @@ import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import static com.example.service.controllers.MainController.context;
-
+@Service
 public class Solution {
 
     @Getter
-    public static final Counter counter =
-            context.getBean("counter", Counter.class);
+    public Counter counter;
 
-    private static final Cache cache =
-            context.getBean("cache", Cache.class);
+    private Cache cache;
 
-    private static @Nullable Integer root;
+    private @Nullable Integer root;
 
-    public static void calculateRoot(@NotNull InputParams inputParams) {
+    public static boolean isCorrectParams(@NotNull InputParams params) {
+        return params.getFirstValue() != null &&
+                params.getSecondValue() != null;
+    }
+
+    public void calculateRoot(@NotNull InputParams inputParams) {
         // Increasing requests counter
         counter.increase();
         ServiceStats.increaseTotalRequests();
@@ -52,9 +57,27 @@ public class Solution {
         }
     }
 
+    @Autowired
+    public void setCache(Cache cache) {
+        this.cache = cache;
+    }
+
+    @Autowired
+    public void setCounter(Counter counter) {
+        this.counter = counter;
+    }
+
+    public Response getResponse() {
+        return new Response(root);
+    }
+
     @Contract(pure = true)
-    public static @NotNull Integer getRoot() {
+    public Integer getRoot() {
         assert root != null;
         return root;
+    }
+
+    public Long getCount() {
+        return counter.getCount();
     }
 }
