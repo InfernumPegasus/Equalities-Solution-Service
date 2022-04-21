@@ -1,14 +1,10 @@
 package com.example.service.services;
 
 import com.example.service.process.InputParams;
-import com.example.service.responses.Response;
 import com.example.service.stats.ServiceStats;
 import com.example.service.logger.MyLogger;
 import lombok.Getter;
 import org.apache.logging.log4j.Level;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +16,14 @@ public class Solution {
 
     private Cache cache;
 
-    private @Nullable Integer root;
-
-    public static boolean isCorrectParams(@NotNull InputParams params) {
-        return params.getFirstValue() != null &&
+    public static boolean isCorrectParams(InputParams params) {
+        return params != null &&
+                params.getFirstValue() != null &&
                 params.getSecondValue() != null;
     }
 
-    public void calculateRoot(@NotNull InputParams inputParams) {
+    public Integer calculateRoot(InputParams inputParams) {
+        Integer root;
         // Increasing requests counter
         counter.increase();
         ServiceStats.increaseTotalRequests();
@@ -40,21 +36,24 @@ public class Solution {
             MyLogger.log(Level.WARN, "Value " + root + " found in cache!");
         } else {
             // If not found
-            found = inputParams.getSecondValue() - inputParams.getFirstValue();
+            root = inputParams.getSecondValue() - inputParams.getFirstValue();
 
-            if (found < inputParams.getLeftBorder() || found > inputParams.getRightBorder()) {
+            if (root < inputParams.getLeftBorder() || root > inputParams.getRightBorder()) {
                 // Increasing wrong requests counter
                 ServiceStats.increaseWrongRequests();
 
-                throw new ArithmeticException(
-                        "Root " + found + " is not in range from " + inputParams.getLeftBorder() +
-                                " and " + inputParams.getRightBorder());
+                var message = """
+                        Root %d is not in range from [%d;%d]
+                        """.formatted(root, inputParams.getLeftBorder(), inputParams.getRightBorder());
+
+                MyLogger.log(Level.ERROR, message);
+                return null;
             }
 
             // Adding { inputParams, root } to cache
-            root = found;
             cache.add(inputParams, root);
         }
+        return root;
     }
 
     @Autowired
@@ -65,16 +64,6 @@ public class Solution {
     @Autowired
     public void setCounter(Counter counter) {
         this.counter = counter;
-    }
-
-    public Response getResponse() {
-        return new Response(root);
-    }
-
-    @Contract(pure = true)
-    public Integer getRoot() {
-        assert root != null;
-        return root;
     }
 
     public Long getCount() {

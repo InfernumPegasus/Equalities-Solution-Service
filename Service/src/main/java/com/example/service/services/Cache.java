@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import com.example.service.logger.MyLogger;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +44,6 @@ public class Cache {
     @PreDestroy
     void preDestroy() {
         solutions.clear();
-        MyLogger.log(Level.WARN, "Cache: map destroyed!");
+        MyLogger.log(Level.WARN, "Cache: destroyed!");
     }
 }

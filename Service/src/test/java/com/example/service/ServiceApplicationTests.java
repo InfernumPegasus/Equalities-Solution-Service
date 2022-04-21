@@ -21,9 +21,8 @@ class ServiceApplicationTests {
 
     @Test
     void isRootEqualToTen() {
-        solution.calculateRoot(new InputParams(10, 20, null, null));
 
-        assertThat(solution.getRoot()).isEqualTo(10);
+        assertThat(solution.calculateRoot(new InputParams(10, 20, null, null))).isEqualTo(10);
     }
 
     @Test
@@ -68,6 +67,5 @@ class ServiceApplicationTests {
                 .count();
 
         assert count == params.size();
-
     }
 }

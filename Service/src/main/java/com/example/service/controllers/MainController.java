@@ -1,6 +1,7 @@
 package com.example.service.controllers;
 
 import com.example.service.SpringConfig;
+import com.example.service.responses.Response;
 import com.example.service.services.Cache;
 import com.example.service.stats.ServiceStats;
 import com.example.service.process.InputParams;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -35,27 +37,14 @@ public class MainController {
             ) {
 
         var params = new InputParams(first_value, second_value, first_border, second_border);
-        if (!Solution.isCorrectParams(params)) {
-            throw new RuntimeException("Wrong params!");
-        }
-        solution.calculateRoot(params);
-        ServiceStats.add(solution.getRoot());
-
-        return new ResponseEntity<>(solution.getResponse(), HttpStatus.OK);
+        return getObjectResponseEntity(params);
     }
 
     @PostMapping("/solve_json")
     public ResponseEntity<Object> solveSingleJson(
             @RequestBody InputParams param
     ) {
-        if (!Solution.isCorrectParams(param)) {
-            throw new RuntimeException("Wrong params!");
-        }
-
-        solution.calculateRoot(param);
-        ServiceStats.add(solution.getRoot());
-
-        return new ResponseEntity<>(solution.getResponse(), HttpStatus.OK);
+        return getObjectResponseEntity(param);
     }
 
     @PostMapping("/solve_bulk")
@@ -66,8 +55,8 @@ public class MainController {
         var roots = params
                 .stream()
                 .filter(Solution::isCorrectParams)
-                .peek(solution::calculateRoot)
-                .map(e -> solution.getRoot())
+                .map(solution::calculateRoot)
+                .filter(Objects::nonNull)
                 .peek(ServiceStats::add)
                 .collect(Collectors.toList());
 
@@ -88,5 +77,20 @@ public class MainController {
     @GetMapping("/stats")
     public ResponseEntity<Object> printStats() {
         return new ResponseEntity<>(ServiceStats.getStats(), HttpStatus.OK);
+    }
+
+    @NotNull
+    private ResponseEntity<Object> getObjectResponseEntity(@RequestBody InputParams param) {
+        if (!Solution.isCorrectParams(param)) {
+            throw new RuntimeException("Wrong params!");
+        }
+
+        var root = solution.calculateRoot(param);
+        if (root == null) {
+            throw new ArithmeticException("Root is not in range!");
+        }
+        ServiceStats.add(root);
+
+        return new ResponseEntity<>(new Response(root), HttpStatus.OK);
     }
 }
