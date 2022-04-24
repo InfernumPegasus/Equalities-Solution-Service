@@ -1,20 +1,21 @@
 package com.example.service.services;
 
 import com.example.service.process.InputParams;
-import com.example.service.stats.ServiceStats;
 import com.example.service.logger.MyLogger;
-import lombok.Getter;
+import com.example.service.stats.Stats;
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class Solution {
+public class SolutionService {
 
-    @Getter
-    public Counter counter;
+    @Autowired
+    public void setCache(CacheService cache) {
+        this.cache = cache;
+    }
 
-    private Cache cache;
+    private CacheService cache;
 
     public static boolean isCorrectParams(InputParams params) {
         return params != null &&
@@ -25,8 +26,7 @@ public class Solution {
     public Integer calculateRoot(InputParams inputParams) {
         Integer root;
         // Increasing requests counter
-        counter.increase();
-        ServiceStats.increaseTotalRequests();
+        Stats.increaseTotalRequests();
 
         // Trying to find root in cache
         var found = cache.find(inputParams);
@@ -40,10 +40,10 @@ public class Solution {
 
             if (root < inputParams.getLeftBorder() || root > inputParams.getRightBorder()) {
                 // Increasing wrong requests counter
-                ServiceStats.increaseWrongRequests();
+                Stats.increaseWrongRequests();
 
                 var message = """
-                        Root %d is not in range from [%d;%d]
+                        Root %d is not in range from [%d; %d]
                         """.formatted(root, inputParams.getLeftBorder(), inputParams.getRightBorder());
 
                 MyLogger.log(Level.ERROR, message);
@@ -54,19 +54,5 @@ public class Solution {
             cache.add(inputParams, root);
         }
         return root;
-    }
-
-    @Autowired
-    public void setCache(Cache cache) {
-        this.cache = cache;
-    }
-
-    @Autowired
-    public void setCounter(Counter counter) {
-        this.counter = counter;
-    }
-
-    public Long getCount() {
-        return counter.getCount();
     }
 }

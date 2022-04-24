@@ -1,7 +1,7 @@
 package com.example.service;
 
 import com.example.service.process.InputParams;
-import com.example.service.services.Solution;
+import com.example.service.services.SolutionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -16,13 +16,15 @@ class ServiceApplicationTests {
     public static AnnotationConfigApplicationContext context =
             new AnnotationConfigApplicationContext(SpringConfig.class);
 
-    private static final Solution solution =
-            context.getBean("solution", Solution.class);
+    private static final SolutionService solution =
+            context.getBean("solutionService", SolutionService.class);
 
     @Test
     void isRootEqualToTen() {
 
-        assertThat(solution.calculateRoot(new InputParams(10, 20, null, null))).isEqualTo(10);
+        assertThat(solution.calculateRoot(
+                new InputParams(10, 20, null, null))
+        ).isEqualTo(10);
     }
 
     @Test

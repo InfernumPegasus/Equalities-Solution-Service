@@ -4,7 +4,6 @@ import com.example.service.process.InputParams;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import com.example.service.logger.MyLogger;
 import org.springframework.stereotype.Service;
 import javax.annotation.PreDestroy;
@@ -12,8 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class Cache {
-
+public class CacheService {
     private static final Map<InputParams, Integer> solutions = new HashMap<>();
 
     public void add(@NotNull InputParams params,
@@ -28,7 +26,12 @@ public class Cache {
         }
     }
 
-    public @Nullable Integer find(@NotNull InputParams params) {
+    public Integer find(InputParams params) {
+        if (params == null) {
+            MyLogger.log(Level.ERROR, "No params provided!");
+            return null;
+        }
+
         if (solutions.containsKey(params))
             return solutions.get(params);
 

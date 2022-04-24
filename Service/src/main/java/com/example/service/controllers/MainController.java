@@ -2,10 +2,10 @@ package com.example.service.controllers;
 
 import com.example.service.SpringConfig;
 import com.example.service.responses.Response;
-import com.example.service.services.Cache;
-import com.example.service.stats.ServiceStats;
+import com.example.service.services.CacheService;
+import com.example.service.stats.Stats;
 import com.example.service.process.InputParams;
-import com.example.service.services.Solution;
+import com.example.service.services.SolutionService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.HttpStatus;
@@ -25,8 +25,8 @@ public class MainController {
     public static AnnotationConfigApplicationContext context =
             new AnnotationConfigApplicationContext(SpringConfig.class);
 
-    private static final Solution solution =
-            context.getBean("solution", Solution.class);
+    private static final SolutionService solution =
+            context.getBean("solutionService", SolutionService.class);
 
     @GetMapping("/solve")
     public ResponseEntity<Object> solve(
@@ -54,10 +54,10 @@ public class MainController {
 
         var roots = params
                 .stream()
-                .filter(Solution::isCorrectParams)
+                .filter(SolutionService::isCorrectParams)
                 .map(solution::calculateRoot)
                 .filter(Objects::nonNull)
-                .peek(ServiceStats::add)
+                .peek(Stats::addRoot)
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(roots, HttpStatus.OK);
@@ -65,23 +65,17 @@ public class MainController {
 
     @GetMapping("/cache")
     public ResponseEntity<String> printCache() {
-        return new ResponseEntity<>(Cache.getStringCache(), HttpStatus.OK);
-    }
-
-    @GetMapping("/counter")
-    public ResponseEntity<String> printCounter() {
-        var response = "Requests count: " + solution.getCount();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(CacheService.getStringCache(), HttpStatus.OK);
     }
 
     @GetMapping("/stats")
     public ResponseEntity<Object> printStats() {
-        return new ResponseEntity<>(ServiceStats.getStats(), HttpStatus.OK);
+        return new ResponseEntity<>(Stats.calculateAndGet(), HttpStatus.OK);
     }
 
     @NotNull
     private ResponseEntity<Object> getObjectResponseEntity(@RequestBody InputParams param) {
-        if (!Solution.isCorrectParams(param)) {
+        if (!SolutionService.isCorrectParams(param)) {
             throw new RuntimeException("Wrong params!");
         }
 
@@ -89,7 +83,7 @@ public class MainController {
         if (root == null) {
             throw new ArithmeticException("Root is not in range!");
         }
-        ServiceStats.add(root);
+        Stats.addRoot(root);
 
         return new ResponseEntity<>(new Response(root), HttpStatus.OK);
     }

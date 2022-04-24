@@ -14,7 +14,7 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 @Getter
-public class ServiceStats {
+public class Stats {
 
     private static List<Integer> roots = new ArrayList<>();
 
@@ -23,10 +23,13 @@ public class ServiceStats {
     private static Long totalRequests = 0L;
     private static Long wrongRequests = 0L;
 
-    @Setter private static Integer min = 0;
-    @Setter private static Integer max = 0;
+    @Setter
+    private static Integer min = 0;
+    @Setter
+    private static Integer max = 0;
 
-    @Setter private static Integer mostPopular = 0;
+    @Setter
+    private static Integer mostPopular = 0;
 
     public static void increaseTotalRequests() {
         totalRequests++;
@@ -36,7 +39,7 @@ public class ServiceStats {
         wrongRequests++;
     }
 
-    private static void countAllParams() {
+    private static void calculate() {
 
         MyLogger.log(Level.INFO, "Collecting stats...");
 
@@ -69,8 +72,9 @@ public class ServiceStats {
         }
     }
 
-    public static @NotNull HashMap<String, Long> getStats() {
-        countAllParams();
+    public static @NotNull HashMap<String, Long> calculateAndGet() {
+        // calculating all stats
+        calculate();
 
         var stats = new HashMap<String, Long>();
 
@@ -83,7 +87,7 @@ public class ServiceStats {
         return stats;
     }
 
-    public static void add(@NotNull Integer root) {
+    public static void addRoot(@NotNull Integer root) {
         roots.add(root);
         shouldBeRecalculated = true;
     }
