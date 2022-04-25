@@ -4,6 +4,7 @@ import com.example.service.SpringConfig;
 import com.example.service.responses.Response;
 import com.example.service.services.CacheService;
 import com.example.service.stats.Stats;
+import com.example.service.stats.StatsProvider;
 import com.example.service.process.InputParams;
 import com.example.service.services.SolutionService;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,9 @@ public class MainController {
 
     private static final SolutionService solution =
             context.getBean("solutionService", SolutionService.class);
+
+    private static final Stats stats =
+            context.getBean("stats", Stats.class);
 
     @GetMapping("/solve")
     public ResponseEntity<Object> solve(
@@ -57,7 +61,7 @@ public class MainController {
                 .filter(SolutionService::isCorrectParams)
                 .map(solution::calculateRoot)
                 .filter(Objects::nonNull)
-                .peek(Stats::addRoot)
+                .peek(StatsProvider::addRoot)
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(roots, HttpStatus.OK);
@@ -70,7 +74,8 @@ public class MainController {
 
     @GetMapping("/stats")
     public ResponseEntity<Object> printStats() {
-        return new ResponseEntity<>(Stats.calculateAndGet(), HttpStatus.OK);
+        StatsProvider.calculate(stats);
+        return new ResponseEntity<>(StatsProvider.calculateAndGet(stats), HttpStatus.OK);
     }
 
     @NotNull
@@ -83,7 +88,7 @@ public class MainController {
         if (root == null) {
             throw new ArithmeticException("Root is not in range!");
         }
-        Stats.addRoot(root);
+        StatsProvider.addRoot(root);
 
         return new ResponseEntity<>(new Response(root), HttpStatus.OK);
     }

@@ -47,7 +47,7 @@ class ServiceApplicationTests {
     void isLeftBorderCorrectIfNull() {
         var params = new InputParams(10, 20, null, 1000);
 
-        assertThat(params.getLeftBorder()).isEqualTo(Integer.MIN_VALUE);
+        assertThat(params.leftBorder()).isEqualTo(Integer.MIN_VALUE);
     }
 
     @Test
@@ -65,7 +65,7 @@ class ServiceApplicationTests {
 
         var count = params
                 .stream()
-                .filter(p -> p.getFirstValue() >= 10 && p.getSecondValue() <= 1000)
+                .filter(p -> p.firstValue() >= 10 && p.secondValue() <= 1000)
                 .count();
 
         assert count == params.size();

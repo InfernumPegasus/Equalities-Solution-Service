@@ -15,18 +15,30 @@ public class SolutionService {
         this.cache = cache;
     }
 
+    @Autowired
+    public void setStats(Stats stats) {
+        this.stats = stats;
+    }
+
     private CacheService cache;
 
+    private Stats stats;
+
     public static boolean isCorrectParams(InputParams params) {
-        return params != null &&
-                params.getFirstValue() != null &&
-                params.getSecondValue() != null;
+        if (
+                params == null || params.firstValue() == null || params.secondValue() == null
+        ) {
+            MyLogger.log(Level.ERROR, "Wrong params: " + params);
+
+            return false;
+        }
+        return true;
     }
 
     public Integer calculateRoot(InputParams inputParams) {
         Integer root;
         // Increasing requests counter
-        Stats.increaseTotalRequests();
+        stats.increaseTotalRequests();
 
         // Trying to find root in cache
         var found = cache.find(inputParams);
@@ -36,15 +48,15 @@ public class SolutionService {
             MyLogger.log(Level.WARN, "Value " + root + " found in cache!");
         } else {
             // If not found
-            root = inputParams.getSecondValue() - inputParams.getFirstValue();
+            root = inputParams.secondValue() - inputParams.firstValue();
 
-            if (root < inputParams.getLeftBorder() || root > inputParams.getRightBorder()) {
+            if (root < inputParams.leftBorder() || root > inputParams.rightBorder()) {
                 // Increasing wrong requests counter
-                Stats.increaseWrongRequests();
+                stats.increaseWrongRequests();
 
                 var message = """
                         Root %d is not in range from [%d; %d]
-                        """.formatted(root, inputParams.getLeftBorder(), inputParams.getRightBorder());
+                        """.formatted(root, inputParams.leftBorder(), inputParams.rightBorder());
 
                 MyLogger.log(Level.ERROR, message);
                 return null;

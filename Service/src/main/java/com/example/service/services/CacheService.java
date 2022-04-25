@@ -19,7 +19,7 @@ public class CacheService {
         if (!solutions.containsKey(params)) {
             solutions.put(params, root);
             var message = """
-            Value %s@root= %d added to cache!
+            Value %s@root=%d added to cache!
             """.formatted(params, root);
 
             MyLogger.log(Level.INFO, message);
