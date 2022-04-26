@@ -12,7 +12,7 @@ public record InputParams(Integer firstValue, Integer secondValue, Integer leftB
         this.firstValue  = firstValue;
         this.secondValue = secondValue;
 
-        this.leftBorder = Objects.requireNonNullElse(leftBorder,  Integer.MIN_VALUE);
+        this.leftBorder  = Objects.requireNonNullElse(leftBorder,  Integer.MIN_VALUE);
         this.rightBorder = Objects.requireNonNullElse(rightBorder, Integer.MAX_VALUE);
     }
 }

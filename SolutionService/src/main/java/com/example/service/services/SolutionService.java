@@ -35,11 +35,13 @@ public class SolutionService {
 
     private Stats stats;
 
-    public static boolean isCorrectParams(InputParams params) {
-        if (
-                params == null || params.firstValue() == null || params.secondValue() == null
+    public boolean isCorrectParams(InputParams params) {
+        if (params == null ||
+                params.firstValue() == null ||
+                params.secondValue() == null
         ) {
             MyLogger.log(Level.ERROR, "Wrong params: " + params);
+            stats.increaseWrongRequests();
 
             return false;
         }

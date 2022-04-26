@@ -61,7 +61,7 @@ public class MainController {
 
         var roots = params
                 .stream()
-                .filter(SolutionService::isCorrectParams)
+                .filter(solution::isCorrectParams)
                 .map(solution::calculateRoot)
                 .filter(Objects::nonNull)
                 .peek(StatsProvider::addRoot)
@@ -88,7 +88,7 @@ public class MainController {
 
         return new ResponseEntity<>(
                 solution.getResultDAO().deleteById(ResultsEntity.class, id) + " deleted"
-                ,HttpStatus.OK);
+                , HttpStatus.OK);
     }
 
     @GetMapping("/result/{id}")
@@ -101,7 +101,7 @@ public class MainController {
     }
 
     private ResponseEntity<Object> getObjectResponseEntity(@RequestBody InputParams param) {
-        if (!SolutionService.isCorrectParams(param)) {
+        if (!solution.isCorrectParams(param)) {
             throw new RuntimeException("Wrong params!");
         }
 
