@@ -1,6 +1,7 @@
 package com.example.service.controllers;
 
 import com.example.service.SpringConfig;
+import com.example.service.entity.ResultsEntity;
 import com.example.service.process.InputParams;
 import com.example.service.response.Response;
 import com.example.service.services.CacheService;
@@ -11,7 +12,9 @@ import com.sun.istack.NotNull;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,26 +36,25 @@ public class MainController {
     private static final Stats stats =
             context.getBean("stats", Stats.class);
 
-    @GetMapping("/solve")
+    @PostMapping("/url")
     public ResponseEntity<Object> solve(
             @RequestParam(value="first_value")   Integer first_value,
             @RequestParam(value="second_value")  Integer second_value,
             @RequestParam(value="first_border")  Integer first_border,
             @RequestParam(value="second_border") Integer second_border
     ) {
-
         var params = new InputParams(first_value, second_value, first_border, second_border);
         return getObjectResponseEntity(params);
     }
 
-    @PostMapping("/solve_json")
+    @PostMapping("/json")
     public ResponseEntity<Object> solveSingleJson(
             @RequestBody InputParams param
     ) {
         return getObjectResponseEntity(param);
     }
 
-    @PostMapping("/solve_bulk")
+    @PostMapping("/bulk")
     public ResponseEntity<Object> solveBulkJson(
             @RequestBody @NotNull List<InputParams> params
     ) {
@@ -79,7 +81,25 @@ public class MainController {
         return new ResponseEntity<>(StatsProvider.calculateAndGet(stats), HttpStatus.OK);
     }
 
-    @NotNull
+    @DeleteMapping("/result/{id}")
+    public ResponseEntity<Object> deleteAll(
+            @PathVariable(value = "id") int id
+    ) {
+
+        return new ResponseEntity<>(
+                solution.getResultDAO().deleteById(ResultsEntity.class, id) + " deleted"
+                ,HttpStatus.OK);
+    }
+
+    @GetMapping("/result/{id}")
+    public ResponseEntity<Object> getRecord(
+            @PathVariable(value = "id") int id
+    ) {
+        return new ResponseEntity<>(
+                solution.getResultDAO().find(ResultsEntity.class, id),
+                HttpStatus.OK);
+    }
+
     private ResponseEntity<Object> getObjectResponseEntity(@RequestBody InputParams param) {
         if (!SolutionService.isCorrectParams(param)) {
             throw new RuntimeException("Wrong params!");
@@ -87,7 +107,7 @@ public class MainController {
 
         var root = solution.calculateRoot(param);
         if (root == null) {
-            throw new ArithmeticException("Root is not in range!");
+            throw new ArithmeticException("Root is null!");
         }
         StatsProvider.addRoot(root);
 

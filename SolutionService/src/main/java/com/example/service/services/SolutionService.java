@@ -1,10 +1,11 @@
 package com.example.service.services;
 
-import com.example.service.db.DBProvider;
+import com.example.service.db.ResultDAO;
 import com.example.service.entity.ResultsEntity;
 import com.example.service.process.InputParams;
 import com.example.service.logger.MyLogger;
 import com.example.service.stats.Stats;
+import lombok.Getter;
 import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,14 @@ public class SolutionService {
     public void setStats(Stats stats) {
         this.stats = stats;
     }
+
+    @Autowired
+    public void setResultDAO(ResultDAO resultDAO) {
+        this.resultDAO = resultDAO;
+    }
+
+    @Getter
+    private ResultDAO resultDAO;
 
     private CacheService cache;
 
@@ -70,7 +79,7 @@ public class SolutionService {
             var res = new ResultsEntity();
             res.setId(0);
             res.setRoot(root);
-            DBProvider.save(res);
+            resultDAO.save(res);
         }
         return root;
     }
