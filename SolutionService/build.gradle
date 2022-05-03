@@ -25,6 +25,7 @@ tasks.withType(JavaCompile) {
 dependencies {
     implementation('org.hibernate:hibernate-core:5.6.1.Final')
     implementation 'org.postgresql:postgresql:42.3.4'
+    implementation 'org.springframework.data:spring-data-jpa:2.6.4'
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")

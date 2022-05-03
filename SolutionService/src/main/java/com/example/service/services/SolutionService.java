@@ -1,14 +1,20 @@
 package com.example.service.services;
 
-import com.example.service.db.ResultDAO;
+import com.example.service.dao.PostgresQLDaoImpl;
 import com.example.service.entity.ResultsEntity;
 import com.example.service.process.InputParams;
 import com.example.service.logger.MyLogger;
-import com.example.service.stats.Stats;
-import lombok.Getter;
+import com.example.service.stats.StatsProvider;
 import org.apache.logging.log4j.Level;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class SolutionService {
@@ -19,21 +25,19 @@ public class SolutionService {
     }
 
     @Autowired
-    public void setStats(Stats stats) {
-        this.stats = stats;
-    }
-
-    @Autowired
-    public void setResultDAO(ResultDAO resultDAO) {
+    @Qualifier("postgresData")
+    public void setResultDAO(PostgresQLDaoImpl resultDAO) {
         this.resultDAO = resultDAO;
     }
 
-    @Getter
-    private ResultDAO resultDAO;
+    @Autowired
+    public void setStatsProvider(StatsProvider statsProvider) {
+        this.statsProvider = statsProvider;
+    }
 
+    private PostgresQLDaoImpl resultDAO;
     private CacheService cache;
-
-    private Stats stats;
+    private StatsProvider statsProvider;
 
     public boolean isCorrectParams(InputParams params) {
         if (params == null ||
@@ -41,17 +45,17 @@ public class SolutionService {
                 params.secondValue() == null
         ) {
             MyLogger.log(Level.ERROR, "Wrong params: " + params);
-            stats.increaseWrongRequests();
+            statsProvider.increaseWrongRequests();
 
             return false;
         }
         return true;
     }
 
-    public Integer calculateRoot(InputParams inputParams) {
+    private @Nullable Integer calculateRoot(InputParams inputParams) {
         Integer root;
         // Increasing requests counter
-        stats.increaseTotalRequests();
+        statsProvider.increaseTotalRequests();
 
         // Trying to find root in cache
         var found = cache.find(inputParams);
@@ -65,7 +69,7 @@ public class SolutionService {
 
             if (root < inputParams.leftBorder() || root > inputParams.rightBorder()) {
                 // Increasing wrong requests counter
-                stats.increaseWrongRequests();
+                statsProvider.increaseWrongRequests();
 
                 var message = """
                         Root %d is not in range from [%d; %d]
@@ -83,6 +87,21 @@ public class SolutionService {
             res.setRoot(root);
             resultDAO.save(res);
         }
+        statsProvider.addRoot(root);
         return root;
+    }
+
+    public Integer calculate(InputParams inputParams) {
+        return calculateRoot(inputParams);
+    }
+
+    public Collection<Integer> calculate(@NotNull Collection<InputParams> inputParams) {
+        return inputParams
+                .stream()
+                .filter(this::isCorrectParams)
+                .map(this::calculateRoot)
+                .filter(Objects::nonNull)
+                .peek(statsProvider::addRoot)
+                .collect(Collectors.toList());
     }
 }

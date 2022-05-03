@@ -33,10 +33,11 @@ public class CacheService {
             return null;
         }
 
-        if (solutions.containsKey(params))
+        if (solutions.containsKey(params)) {
+            MyLogger.log(Level.WARN, "Root for " + params + " found in cache!");
             return solutions.get(params);
-
-        MyLogger.log(Level.WARN, "Value " + params + " was not found in cache!");
+        }
+        MyLogger.log(Level.WARN, "Root for " + params + " was not found in cache!");
         return null;
     }
 

@@ -1,14 +1,27 @@
-package com.example.service.db;
+package com.example.service.dao;
 
 import com.example.service.entity.ResultsEntity;
 import com.example.service.logger.MyLogger;
 import org.apache.logging.log4j.Level;
-import org.springframework.stereotype.Service;
-import static com.example.service.db.DBManager.entityManager;
-import static com.example.service.db.DBManager.entityTransaction;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 
-@Service
-public class ResultDAO implements DAO {
+@Repository
+@Qualifier("postgresData")
+public class PostgresQLDaoImpl implements PostgresQLDao {
+
+    public EntityManagerFactory entityManagerFactory
+            = Persistence.createEntityManagerFactory("default");
+
+    public EntityManager entityManager =
+            entityManagerFactory.createEntityManager();
+
+    public EntityTransaction entityTransaction =
+            entityManager.getTransaction();
 
     @Override
     public void save(ResultsEntity value) {

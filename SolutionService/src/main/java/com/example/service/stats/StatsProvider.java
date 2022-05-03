@@ -1,30 +1,50 @@
 package com.example.service.stats;
 
 import com.example.service.logger.MyLogger;
-import lombok.Getter;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
-@Getter
+@Service
 public class StatsProvider {
 
     private static List<Integer> roots = new ArrayList<>();
 
+    private Stats stats;
+
     private static boolean shouldBeRecalculated = true;
 
-    public static void calculate(Stats stats) {
+    @Autowired
+    public void setStats(Stats stats) {
+        this.stats = stats;
+    }
+
+    public Stats getStats() {
+        return stats;
+    }
+
+    public void increaseTotalRequests() {
+        stats.increaseTotalRequests();
+    }
+
+    public void increaseWrongRequests() {
+        stats.increaseWrongRequests();
+    }
+
+    public void calculate() {
 
         MyLogger.log(Level.INFO, "Collecting stats...");
 
         if (shouldBeRecalculated) {
-            stats.mostPopular = roots
+            stats.mostCommon = roots
                     .stream()
                     .reduce(
                             BinaryOperator.maxBy(Comparator.comparingInt(o -> Collections.frequency(roots, o)))
@@ -52,22 +72,7 @@ public class StatsProvider {
         }
     }
 
-    public static @NotNull HashMap<String, Long> calculateAndGet(Stats stats) {
-        // calculating all stats
-        calculate(stats);
-
-        var response = new HashMap<String, Long>();
-
-        response.put("TotalRequests", stats.totalRequests);
-        response.put("WrongRequests", stats.wrongRequests);
-        response.put("Min", stats.min.longValue());
-        response.put("Max", stats.max.longValue());
-        response.put("MostCommon", stats.mostPopular.longValue());
-
-        return response;
-    }
-
-    public static void addRoot(@NotNull Integer root) {
+    public void addRoot(@NotNull Integer root) {
         roots.add(root);
         shouldBeRecalculated = true;
     }
