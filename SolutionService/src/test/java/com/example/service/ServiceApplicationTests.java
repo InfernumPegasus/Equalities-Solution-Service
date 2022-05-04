@@ -17,7 +17,7 @@ class ServiceApplicationTests {
     @Test
     void isRootEqualToTen() {
 
-        assert solution.calculateRoot(
+        assert solution.calculate(
                 new InputParams(10, 20, null, null)
         ) == 10;
 

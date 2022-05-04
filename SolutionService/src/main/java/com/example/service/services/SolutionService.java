@@ -1,6 +1,6 @@
 package com.example.service.services;
 
-import com.example.service.dao.PostgresQLDaoImpl;
+import com.example.service.dao.PostgresQLDao;
 import com.example.service.entity.ResultsEntity;
 import com.example.service.process.InputParams;
 import com.example.service.logger.MyLogger;
@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -26,8 +25,8 @@ public class SolutionService {
 
     @Autowired
     @Qualifier("postgresData")
-    public void setResultDAO(PostgresQLDaoImpl resultDAO) {
-        this.resultDAO = resultDAO;
+    public void setPostgresQLDao(PostgresQLDao postgresQLDao) {
+        this.postgresQLDao = postgresQLDao;
     }
 
     @Autowired
@@ -35,7 +34,7 @@ public class SolutionService {
         this.statsProvider = statsProvider;
     }
 
-    private PostgresQLDaoImpl resultDAO;
+    private PostgresQLDao postgresQLDao;
     private CacheService cache;
     private StatsProvider statsProvider;
 
@@ -85,7 +84,7 @@ public class SolutionService {
             var res = new ResultsEntity();
             res.setId(0);
             res.setRoot(root);
-            resultDAO.save(res);
+            postgresQLDao.save(res);
         }
         statsProvider.addRoot(root);
         return root;

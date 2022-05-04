@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,18 +31,23 @@ public class StatsProvider {
     }
 
     public void increaseTotalRequests() {
-        stats.increaseTotalRequests();
+        stats.totalRequests++;
     }
 
     public void increaseWrongRequests() {
-        stats.increaseWrongRequests();
+        stats.wrongRequests++;
     }
 
     public void calculate() {
 
         MyLogger.log(Level.INFO, "Collecting stats...");
 
-        if (shouldBeRecalculated) {
+        if (!shouldBeRecalculated) {
+            MyLogger.log(Level.WARN, "Stats need not to be recollected!");
+            return;
+        }
+
+        try {
             stats.mostCommon = roots
                     .stream()
                     .reduce(
@@ -66,9 +70,12 @@ public class StatsProvider {
                     .max(Comparator.comparing(Long::valueOf))
                     .orElse(0);
 
-            MyLogger.log(Level.WARN, "StatsProvider recollected!");
+            MyLogger.log(Level.WARN, "Stats recollected!");
 
             shouldBeRecalculated = false;
+        } catch (NullPointerException exception) {
+            MyLogger.log(Level.ERROR, "Error while collecting stats!");
+            throw new RuntimeException(exception);
         }
     }
 
