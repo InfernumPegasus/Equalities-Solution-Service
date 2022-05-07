@@ -1,4 +1,4 @@
-package com.example.service.process;
+package com.example.service.input;
 
 import java.util.Objects;
 

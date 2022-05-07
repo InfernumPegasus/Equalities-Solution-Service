@@ -1,7 +1,7 @@
 package com.example.service.services;
 
 import com.example.service.logger.MyLogger;
-import com.example.service.process.InputParams;
+import com.example.service.input.InputParams;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

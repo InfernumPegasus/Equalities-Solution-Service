@@ -1,6 +1,6 @@
 package com.example.service;
 
-import com.example.service.process.InputParams;
+import com.example.service.input.InputParams;
 import com.example.service.services.SolutionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

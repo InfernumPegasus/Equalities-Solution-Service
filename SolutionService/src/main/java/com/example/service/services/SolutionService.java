@@ -2,7 +2,7 @@ package com.example.service.services;
 
 import com.example.service.dao.PostgresQLDao;
 import com.example.service.entity.ResultsEntity;
-import com.example.service.process.InputParams;
+import com.example.service.input.InputParams;
 import com.example.service.logger.MyLogger;
 import com.example.service.stats.StatsProvider;
 import org.apache.logging.log4j.Level;
@@ -91,6 +91,9 @@ public class SolutionService {
     }
 
     public Integer calculate(InputParams inputParams) {
+        if (!isCorrectParams(inputParams)) {
+            throw new IllegalArgumentException("Wrong params: " + inputParams);
+        }
         return calculateRoot(inputParams);
     }
 
