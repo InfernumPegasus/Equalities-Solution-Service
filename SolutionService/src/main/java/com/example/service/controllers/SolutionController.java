@@ -25,27 +25,24 @@ public class SolutionController {
 
 
     @PostMapping("/url")
-    public ResponseEntity<Object> solve(
+    public ResponseEntity<Integer> solve(
             @RequestParam(value="first_value")   @Nullable Integer first_value,
             @RequestParam(value="second_value")  @Nullable Integer second_value,
             @RequestParam(value="first_border")  @Nullable Integer first_border,
-            @RequestParam(value="second_border") @Nullable Integer second_border
-    ) {
+            @RequestParam(value="second_border") @Nullable Integer second_border) {
         var params = new InputParams(first_value, second_value, first_border, second_border);
         return new ResponseEntity<>(solutionService.calculate(params), HttpStatus.OK);
     }
 
     @PostMapping("/json")
-    public ResponseEntity<Object> solveSingleJson(
-            @RequestBody InputParams param
-    ) {
+    public ResponseEntity<Integer> solveSingleJson(
+            @RequestBody InputParams param) {
         return new ResponseEntity<>(solutionService.calculate(param), HttpStatus.OK);
     }
 
     @PostMapping("/bulk")
-    public ResponseEntity<Object> solveBulkJson(
-            @RequestBody @NotNull Collection<InputParams> inputParamsList
-    ) {
+    public ResponseEntity<Collection<Integer>> solveBulkJson(
+            @RequestBody @NotNull Collection<InputParams> inputParamsList) {
         return new ResponseEntity<>(solutionService.calculate(inputParamsList), HttpStatus.OK);
     }
 

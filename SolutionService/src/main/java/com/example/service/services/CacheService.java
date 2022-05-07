@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.PreDestroy;
 import java.util.HashMap;
 import java.util.Map;

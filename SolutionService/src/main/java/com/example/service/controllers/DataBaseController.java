@@ -23,7 +23,7 @@ public class DataBaseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteAll(
+    public ResponseEntity<String> deleteById(
             @PathVariable(value = "id") int id
     ) {
         return new ResponseEntity<>(
@@ -32,7 +32,7 @@ public class DataBaseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getRecord(
+    public ResponseEntity<ResultsEntity> getRecord(
             @PathVariable(value = "id") int id
     ) {
         return new ResponseEntity<>(

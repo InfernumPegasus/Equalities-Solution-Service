@@ -1,6 +1,7 @@
 package com.example.service.controllers;
 
 import com.example.service.services.CacheService;
+import com.example.service.stats.Stats;
 import com.example.service.stats.StatsProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class StatsController {
     }
 
     @GetMapping
-    public Object getAllStats() {
+    public Stats getAllStats() {
         statsProvider.calculate();
         return statsProvider.getStats();
     }
