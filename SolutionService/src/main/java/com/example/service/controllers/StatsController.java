@@ -1,5 +1,6 @@
 package com.example.service.controllers;
 
+import com.example.service.input.InputParams;
 import com.example.service.services.CacheService;
 import com.example.service.stats.Stats;
 import com.example.service.stats.StatsProvider;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/stats")
@@ -21,13 +23,13 @@ public class StatsController {
     }
 
     @GetMapping
-    public Stats getAllStats() {
+    public ResponseEntity<Stats> getAllStats() {
         statsProvider.calculate();
-        return statsProvider.getStats();
+        return new ResponseEntity<>(statsProvider.getStats(), HttpStatus.OK);
     }
 
     @GetMapping("/cache")
-    public ResponseEntity<String> printCache() {
-        return new ResponseEntity<>(CacheService.getStringCache(), HttpStatus.OK);
+    public ResponseEntity<Map<InputParams, Integer>> getCache() {
+        return new ResponseEntity<>(CacheService.getSolutions(), HttpStatus.OK);
     }
 }

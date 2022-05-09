@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Commands</title>
+</head>
+<body style="text-align: center; font-family: 'Droid Sans Mono', serif">
+    <h2>
+        <span style="font-size: xxx-large; font-weight: bolder; font-family: Arial, serif">
+            Welcome to Equalities Solution Service!<br>
+        </span>
+    </h2>
+    <hr>
+
+    <h1 style="font-size: xx-large">
+        <span style="text-decoration: underline; background-color: floralwhite">
+            Service needs params to work:<br>
+        </span>
+        <span style="font-size: x-large; text-align: center">
+                - firstValue : Required<br>
+                - secondValue : Required<br>
+                - leftBorder, rightBorder : Optional
+        </span>
+    </h1>
+    <hr>
+
+    <h1 style="font-size: xx-large">
+        <span style="text-decoration: underline; background-color: floralwhite">
+            Possible user requests:
+        </span>
+    </h1>
+
+    <h3 style="font-size: xx-large">
+        1) /solve/<span style="background-color: navajowhite">url</span> - <span style="text-decoration: underline"> GET</span> Request
+        <br>
+        <span style="font-size: x-large">
+            Solves equality using input parameters received from GET request in Json format.
+            Otherwise, service returns exception.
+        </span>
+        <br>
+    </h3>
+
+    <h3 style="font-size: xx-large">
+        2) /solve/<span style="background-color: navajowhite">json</span> - <span style="text-decoration: underline"> POST</span> Request
+        <br>
+        <span style="font-size: x-large">
+            Solves equality using input parameters received from POST request in Json format.
+            Otherwise, service returns exception.
+        </span>
+    </h3>
+
+    <h3 style="font-size: xx-large">
+        3) /solve/<span style="background-color: navajowhite">bulk</span> - <span style="text-decoration: underline"> POST</span> Request
+        <br>
+        <span style="font-size: x-large">
+            Solves equalities using list of input parameters received from POST request in Json format.
+            If there are incorrect input params service returns list of calculated roots from correct ones.
+        </span>
+    </h3>
+
+    <hr>
+</body>
+</html>

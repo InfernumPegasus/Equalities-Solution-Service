@@ -3,16 +3,15 @@ package com.example.service.services;
 import com.example.service.logger.MyLogger;
 import com.example.service.input.InputParams;
 import org.apache.logging.log4j.Level;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import javax.annotation.PreDestroy;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class CacheService {
-    private static final Map<InputParams, Integer> solutions = new HashMap<>();
+    private static final Map<InputParams, Integer> solutions = new ConcurrentHashMap<>();
 
     public void add(@NotNull InputParams params,
                     @NotNull Integer root) {
@@ -40,9 +39,8 @@ public class CacheService {
         return null;
     }
 
-    @Contract(pure = true)
-    public static @NotNull String getStringCache() {
-        return ("Cache:\n" + solutions);
+    public static Map<InputParams, Integer> getSolutions() {
+        return solutions;
     }
 
     @PreDestroy
