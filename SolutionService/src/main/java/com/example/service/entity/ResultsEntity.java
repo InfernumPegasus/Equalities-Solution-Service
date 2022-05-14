@@ -13,6 +13,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Objects;
 
+/**
+ * Entity which is used for
+ * storing in DataBase.
+ */
 @Getter
 @Setter
 @ToString

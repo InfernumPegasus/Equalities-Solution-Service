@@ -14,18 +14,35 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 
+
+/**
+ * REST Controller for
+ * equalities solving.
+ */
 @RestController
 @RequestMapping("/solve")
 public class SolutionController {
 
-    private SolutionService solutionService;
+    /**
+     * Instance of {@link SolutionService}
+     * which is used for solving equalities
+     */
+    private final SolutionService solutionService;
 
     @Autowired
-    public void setSolutionService(SolutionService solutionService) {
+    public SolutionController(SolutionService solutionService) {
         this.solutionService = solutionService;
     }
 
-
+    /**
+     * Method which is used for solving
+     * equality from provided {@link Integer} params.
+     * @param firstValue first value in the left part of equality
+     * @param secondValue second value in the left part of equality
+     * @param leftBorder min border for the root
+     * @param rightBorder max border for the root
+     * @return {@link ResponseEntity<Integer>} with root and status code CREATED if success
+     */
     @PostMapping(value = "/url")
     public ResponseEntity<Integer> solveUrl(
             @RequestParam @Nullable Integer firstValue,
@@ -36,12 +53,27 @@ public class SolutionController {
         return new ResponseEntity<>(solutionService.calculate(params), HttpStatus.CREATED);
     }
 
+    /**
+     * Method which is used for solving
+     * equality from provided {@link InputParams}
+     * from json file.
+     * @param params input params
+     * @return {@link ResponseEntity<Integer>} with root and status code CREATED if success
+     */
     @PostMapping("/json")
     public ResponseEntity<Integer> solveSingleJson(
             @RequestBody InputParams params) {
         return new ResponseEntity<>(solutionService.calculate(params), HttpStatus.CREATED);
     }
 
+    /**
+     * Method which is used for solving
+     * equality from provided
+     * {@link Collection} of
+     * {@link InputParams} from json.
+     * @param inputParamsList collection of input params
+     * @return {@link ResponseEntity} with list of roots and status code CREATED
+     */
     @PostMapping("/bulk")
     public ResponseEntity<Collection<Integer>> solveBulkJson(
             @RequestBody @NotNull Collection<InputParams> inputParamsList) {

@@ -11,28 +11,42 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST Controller for
+ * manipulations with DB.
+ */
 @RestController
 @RequestMapping("/db")
 public class DataBaseController {
 
-    private PostgresQLDaoImpl resultDAO;
+    private final PostgresQLDaoImpl resultDAO;
 
     @Autowired
-    public void setResultDAO(PostgresQLDaoImpl resultDAO) {
+    public DataBaseController(PostgresQLDaoImpl resultDAO) {
         this.resultDAO = resultDAO;
     }
 
+    /**
+     * Deletes record from DB by id
+     * @param id id of record
+     * @return {@link ResponseEntity<String>} with status code OK if success
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteById(
             @PathVariable(value = "id") int id
     ) {
         return new ResponseEntity<>(
-                resultDAO.deleteById(ResultsEntity.class, id) + " deleted"
-                ,HttpStatus.OK);
+                resultDAO.deleteByKey(ResultsEntity.class, id) + " deleted",
+                HttpStatus.OK);
     }
 
+    /**
+     * Gets record from DB by id
+     * @param id id of record
+     * @return {@link ResponseEntity<String>} with status code OK if success
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<ResultsEntity> getRecord(
+    public ResponseEntity<ResultsEntity> getById(
             @PathVariable(value = "id") int id
     ) {
         return new ResponseEntity<>(

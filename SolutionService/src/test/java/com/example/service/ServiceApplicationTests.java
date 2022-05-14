@@ -1,27 +1,10 @@
 package com.example.service;
 
 import com.example.service.input.InputParams;
-import com.example.service.services.SolutionService;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import java.util.LinkedList;
 
 class ServiceApplicationTests {
-
-    public static AnnotationConfigApplicationContext context =
-            new AnnotationConfigApplicationContext(SpringConfig.class);
-
-    private static final SolutionService solution =
-            context.getBean("solutionService", SolutionService.class);
-
-    @Test
-    void isRootEqualToTen() {
-
-        assert solution.calculate(
-                new InputParams(10, 20, null, null)
-        ) == 10;
-
-    }
 
     @Test
     void areTwoSameObjectsEqual() {

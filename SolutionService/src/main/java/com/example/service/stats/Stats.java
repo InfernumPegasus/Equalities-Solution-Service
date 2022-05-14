@@ -3,6 +3,10 @@ package com.example.service.stats;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 
+/**
+ * Class which contains
+ * all calculated stats.
+ */
 @Component
 @Getter
 public class Stats {

@@ -12,14 +12,35 @@ import java.util.List;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
+/**
+ * This Service provides statistics
+ * for SolutionService: counts amount
+ * of total and wrong requests,
+ * min and max of roots and most
+ * common from them.
+ */
 @Service
 public class StatsProvider {
 
-    private static List<Integer> roots = new ArrayList<>();
+    /**
+     * List of calculated roots.
+     * Uses for getting stats.
+     */
+    private List<Integer> roots = new ArrayList<>();
 
+    /**
+     * Stats variable which used
+     * to store all the stats.
+     * Contained in package-private class.
+     */
     private Stats stats;
 
-    private static boolean shouldBeRecalculated = true;
+    /**
+     * Variable that indicates
+     * whether stats should
+     * be recollected.
+     */
+    private boolean shouldBeRecalculated = true;
 
     @Autowired
     public void setStats(Stats stats) {
@@ -38,7 +59,14 @@ public class StatsProvider {
         stats.wrongRequests++;
     }
 
-    public void calculate() {
+    /**
+     * Recollects stats.
+     * If stats need to be recollected
+     * calculates min, max, most common
+     * and will not recalculate them
+     * until new root added to the list.
+     */
+    public void collect() {
 
         MyLogger.log(Level.INFO, "Collecting stats...");
 
@@ -79,6 +107,12 @@ public class StatsProvider {
         }
     }
 
+    /**
+     * Adds root to the list
+     * and makes list available
+     * to collecting stats again.
+     * @param root value to be added
+     */
     public void addRoot(@NotNull Integer root) {
         roots.add(root);
         shouldBeRecalculated = true;

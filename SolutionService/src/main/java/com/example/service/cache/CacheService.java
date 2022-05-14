@@ -1,4 +1,4 @@
-package com.example.service.services;
+package com.example.service.cache;
 
 import com.example.service.logger.MyLogger;
 import com.example.service.input.InputParams;
@@ -9,10 +9,18 @@ import javax.annotation.PreDestroy;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Service provides in-memory cache
+ */
 @Service
 public class CacheService {
-    private static final Map<InputParams, Integer> solutions = new ConcurrentHashMap<>();
+    private final Map<InputParams, Integer> solutions = new ConcurrentHashMap<>();
 
+    /**
+     * Adds pair <{@link InputParams}, {@link Integer}> to cache
+     * @param params key
+     * @param root value
+     */
     public void add(@NotNull InputParams params,
                     @NotNull Integer root) {
         if (!solutions.containsKey(params)) {
@@ -25,12 +33,23 @@ public class CacheService {
         }
     }
 
-    public Integer find(InputParams params) {
-        if (params == null) {
-            MyLogger.log(Level.ERROR, "No params provided!");
-            return null;
-        }
+    /**
+     * Checks whether cache contains
+     * {@link InputParams} value
+     * @param value value to check
+     * @return true if exists, false otherwise
+     */
+    public boolean contains(InputParams value) {
+        return solutions.containsKey(value);
+    }
 
+    /**
+     * Gets {@link Integer} value by
+     * {@link InputParams} key
+     * @param params key
+     * @return found value, null otherwise
+     */
+    public Integer get(InputParams params) {
         if (solutions.containsKey(params)) {
             MyLogger.log(Level.WARN, "Root for " + params + " found in cache!");
             return solutions.get(params);
@@ -39,7 +58,7 @@ public class CacheService {
         return null;
     }
 
-    public static Map<InputParams, Integer> getSolutions() {
+    public Map<InputParams, Integer> getSolutions() {
         return solutions;
     }
 

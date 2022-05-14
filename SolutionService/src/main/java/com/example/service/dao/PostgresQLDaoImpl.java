@@ -10,25 +10,29 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
+/**
+ * Implementation of {@link PostgresQLDao} interface.
+ */
 @Repository
 @Qualifier("postgresData")
-public class PostgresQLDaoImpl implements PostgresQLDao {
+public class PostgresQLDaoImpl implements PostgresQLDao<ResultsEntity, Integer> {
 
-    public EntityManagerFactory entityManagerFactory
+    private final EntityManagerFactory entityManagerFactory
             = Persistence.createEntityManagerFactory("default");
 
-    public EntityManager entityManager =
+    private final EntityManager entityManager =
             entityManagerFactory.createEntityManager();
 
-    public EntityTransaction entityTransaction =
+    private final EntityTransaction entityTransaction =
             entityManager.getTransaction();
 
+    /**
+     * Saves {@link ResultsEntity} in DataBase.
+     * @param value value to store
+     */
     @Override
     public void save(ResultsEntity value) {
-        if (entityTransaction.isActive()) {
-            MyLogger.log(Level.ERROR, "Transaction is alive");
-            entityTransaction.rollback();
-        }
+        closeAliveTransaction();
 
         entityTransaction.begin();
         entityManager.persist(value);
@@ -37,12 +41,16 @@ public class PostgresQLDaoImpl implements PostgresQLDao {
         MyLogger.log(Level.INFO, value + " saved");
     }
 
+    /**
+     * Finds {@link ResultsEntity} by {@link Integer} id
+     * @param entityClass parameter class
+     * @param primaryKey key for search
+     * @return found {@link ResultsEntity} value
+     * @throws RuntimeException if no such value
+     */
     @Override
-    public ResultsEntity find(Class<ResultsEntity> entityClass, int primaryKey) {
-        if (entityTransaction.isActive()) {
-            MyLogger.log(Level.ERROR, "Transaction is alive");
-            entityTransaction.rollback();
-        }
+    public ResultsEntity find(Class<ResultsEntity> entityClass, Integer primaryKey) {
+        closeAliveTransaction();
 
         var found = entityManager.find(entityClass, primaryKey);
 
@@ -52,12 +60,14 @@ public class PostgresQLDaoImpl implements PostgresQLDao {
         return found;
     }
 
+    /**
+     * Deletes {@link ResultsEntity} value from DataBase
+     * @param value value to delete
+     * @return {@link ResultsEntity} deleted value
+     */
     @Override
     public ResultsEntity delete(ResultsEntity value) {
-        if (entityTransaction.isActive()) {
-            MyLogger.log(Level.ERROR, "Transaction is alive");
-            entityTransaction.rollback();
-        }
+        closeAliveTransaction();
 
         entityTransaction.begin();
 
@@ -72,14 +82,25 @@ public class PostgresQLDaoImpl implements PostgresQLDao {
         return found;
     }
 
+    /**
+     * Deletes {@link ResultsEntity} value by {@link Integer} id from DataBase
+     * @param entityClass class of value
+     * @param primaryKey key to delete
+     * @return {@link ResultsEntity} deleted value
+     */
     @Override
-    public ResultsEntity deleteById(Class<ResultsEntity> entityClass, int primaryKey) {
+    public ResultsEntity deleteByKey(Class<ResultsEntity> entityClass, Integer primaryKey) {
+        return delete(find(entityClass, primaryKey));
+    }
+
+    /**
+     * Closes alive transaction if needed
+     */
+    private void closeAliveTransaction() {
         if (entityTransaction.isActive()) {
             MyLogger.log(Level.ERROR, "Transaction is alive");
             entityTransaction.rollback();
         }
-
-        return delete(find(entityClass, primaryKey));
     }
 }
 

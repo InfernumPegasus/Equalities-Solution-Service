@@ -13,10 +13,24 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import javax.persistence.PersistenceException;
 
+/**
+ * This class' aim is exception
+ * handling. If exception thrown
+ * this class executes handler method
+ * and logs info about exception.
+ * if exception is not connected with
+ * DB, increases amount of wrong
+ * requests in Stats.
+ */
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
 public class DefaultAdvice extends ResponseEntityExceptionHandler {
 
+    /**
+     * Provides class with
+     * the ability to increase
+     * wrong requests amount.
+     */
     private StatsProvider statsProvider;
 
     @Autowired
