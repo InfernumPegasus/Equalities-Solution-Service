@@ -2,7 +2,6 @@ package com.example.service.services;
 
 import com.example.service.cache.CacheService;
 import com.example.service.dao.PostgresQLDaoImpl;
-import com.example.service.entity.ResultsEntity;
 import com.example.service.input.InputParams;
 import com.example.service.logger.MyLogger;
 import com.example.service.stats.StatsProvider;
@@ -11,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Service which is used for solving
@@ -28,6 +27,7 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
     /**
      * Method which is used to check
      * if {@link InputParams} value is valid
+     *
      * @param params value to be checked
      * @return true if correct, false otherwise
      */
@@ -35,7 +35,6 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
         if (params == null ||
                 params.firstValue() == null ||
                 params.secondValue() == null) {
-            MyLogger.log(Level.ERROR, "Wrong params: " + params);
             statsProvider.increaseWrongRequests();
 
             return false;
@@ -44,11 +43,23 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
     }
 
     /**
+     * Checks if root is between left and right borders
+     * @param root value to be checked
+     * @param left left border
+     * @param right right border
+     * @return true if correct, else otherwise
+     */
+    private boolean isRootBetweenBorders(int root, int left, int right) {
+        return root >= left && root <= right;
+    }
+
+    /**
      * Solves equality by provided
      * {@link InputParams}.
      * Adds calculated value to cache,
      * DataBase and makes it available
      * for statistics collected by {@link StatsProvider}.
+     *
      * @param inputParams value for solving
      * @return {@link Integer} calculated root
      */
@@ -56,32 +67,34 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
         // Increasing requests counter
         statsProvider.increaseTotalRequests();
 
-        Function<InputParams, Integer> solve = e -> {
-            if (cache.contains(e)) {
-                return cache.get(e);
-            }
+        Function<InputParams, Integer> calcFunction =
+                i -> cache.contains(i) ? cache.get(i) :
+                        i.secondValue() - i.firstValue();
 
-            int root = e.secondValue() - e.firstValue();
-            if (root >= e.leftBorder() && root <= e.rightBorder()) {
-                return root;
-            }
-            throw new IllegalArgumentException("Wrong params!");
-        };
-        var res = solve.apply(inputParams);
-        cache.add(inputParams, res);
-        statsProvider.addRoot(res);
+        return calcFunction
+                .andThen(root -> {
+                    boolean correct = isRootBetweenBorders(root,
+                            inputParams.leftBorder(),
+                            inputParams.rightBorder());
 
-        var entity = new ResultsEntity();
-        entity.setId(0);
-        entity.setRoot(res);
-        postgresQLDao.save(entity);
+                    if (!correct) {
+                        statsProvider.increaseWrongRequests();
+                        throw new IllegalArgumentException("Wrong borders: " + inputParams);
+                    }
 
-        return res;
+                    cache.add(inputParams, root);
+                    statsProvider.addRoot(root);
+                    postgresQLDao.save(root);
+
+                    return root;
+                })
+                .apply(inputParams);
     }
 
     /**
      * Method which is used for
      * solving single equality.
+     *
      * @param inputParams value for solving
      * @return {@link Integer} calculated root
      */
@@ -99,7 +112,14 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
         return inputParams
                 .stream()
                 .filter(this::isCorrectParams)
-                .map(this::solve)
-                .collect(Collectors.toList());
+                .map(e -> {
+                    try {
+                        return solve(e);
+                    } catch (IllegalArgumentException exception) {
+                        MyLogger.log(Level.ERROR, exception.getMessage());
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull).toList();
     }
 }

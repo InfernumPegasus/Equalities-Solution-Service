@@ -27,7 +27,7 @@ public class PostgresQLDaoImpl implements PostgresQLDao<ResultsEntity, Integer> 
             entityManager.getTransaction();
 
     /**
-     * Saves {@link ResultsEntity} in DataBase.
+     * Saves {@link ResultsEntity} in DataBase
      * @param value value to store
      */
     @Override
@@ -39,6 +39,14 @@ public class PostgresQLDaoImpl implements PostgresQLDao<ResultsEntity, Integer> 
         entityTransaction.commit();
 
         MyLogger.log(Level.INFO, value + " saved");
+    }
+
+    /**
+     * Saves created {@link ResultsEntity} in DataBase
+     * @param value value to store
+     */
+    public void save(Integer value) {
+        save(new ResultsEntity(value));
     }
 
     /**

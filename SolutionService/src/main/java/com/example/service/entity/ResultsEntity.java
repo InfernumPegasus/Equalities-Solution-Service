@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,33 +12,33 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Objects;
 
-/**
- * Entity which is used for
- * storing in DataBase.
- */
+@Entity
+@Table(name = "results")
 @Getter
 @Setter
 @ToString
-@Entity
-@Table(name = "results", schema = "public", catalog = "postgres")
 public class ResultsEntity {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "id")
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Integer id;
 
-    @Basic
+    public ResultsEntity() {
+    }
+
+    public ResultsEntity(Integer root) {
+        this.root = root;
+    }
+
     @Column(name = "root")
-    private int root;
+    private Integer root;
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
-            return false;
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         ResultsEntity that = (ResultsEntity) o;
-        return Objects.equals(id, that.id);
+        return id != null && Objects.equals(id, that.id);
     }
 
     @Override
