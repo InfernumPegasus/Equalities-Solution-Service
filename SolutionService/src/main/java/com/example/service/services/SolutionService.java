@@ -6,11 +6,14 @@ import com.example.service.input.InputParams;
 import com.example.service.logger.MyLogger;
 import com.example.service.stats.StatsProvider;
 import org.apache.logging.log4j.Level;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 
 /**
@@ -27,7 +30,6 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
     /**
      * Method which is used to check
      * if {@link InputParams} value is valid
-     *
      * @param params value to be checked
      * @return true if correct, false otherwise
      */
@@ -59,7 +61,6 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
      * Adds calculated value to cache,
      * DataBase and makes it available
      * for statistics collected by {@link StatsProvider}.
-     *
      * @param inputParams value for solving
      * @return {@link Integer} calculated root
      */
@@ -91,13 +92,7 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
                 .apply(inputParams);
     }
 
-    /**
-     * Method which is used for
-     * solving single equality.
-     *
-     * @param inputParams value for solving
-     * @return {@link Integer} calculated root
-     */
+
     public Integer calculate(InputParams inputParams) {
         return solve(inputParams);
     }
@@ -105,21 +100,33 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
     /**
      * Method which is used for
      * solving multiple equalities.
-     * @param inputParams values for solving
+     * @param params values for solving
      * @return {@link Collection} of calculated roots
      */
-    public Collection<Integer> calculate(@NotNull Collection<InputParams> inputParams) {
-        return inputParams
-                .stream()
-                .filter(this::isCorrectParams)
-                .map(e -> {
-                    try {
-                        return solve(e);
-                    } catch (IllegalArgumentException exception) {
-                        MyLogger.log(Level.ERROR, exception.getMessage());
+    public Collection<Integer> calculate(Collection<InputParams> params) {
+        Executor executor = Executors.newCachedThreadPool();
+
+        CompletableFuture<Collection<Integer>> completableFuture = CompletableFuture.supplyAsync(() -> {
+            MyLogger.log(Level.WARN, "Current thread : " + Thread.currentThread().getName());
+            return params
+                    .stream()
+                    .filter(this::isCorrectParams)
+                    .map(e -> {
+                        try {
+                            return solve(e);
+                        } catch (IllegalArgumentException exception) {
+                            MyLogger.log(Level.ERROR, exception.getMessage());
+                        }
                         return null;
-                    }
-                })
-                .filter(Objects::nonNull).toList();
+                    })
+                    .filter(Objects::nonNull)
+                    .toList();
+        }, executor);
+
+        try {
+            return completableFuture.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
