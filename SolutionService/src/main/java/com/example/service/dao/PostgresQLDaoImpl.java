@@ -2,7 +2,6 @@ package com.example.service.dao;
 
 import com.example.service.entity.ResultsEntity;
 import com.example.service.logger.MyLogger;
-import org.apache.logging.log4j.Level;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
@@ -38,7 +37,7 @@ public class PostgresQLDaoImpl implements PostgresQLDao<ResultsEntity, Integer> 
         entityManager.persist(value);
         entityTransaction.commit();
 
-        MyLogger.log(Level.INFO, value + " saved");
+        MyLogger.info(value + " saved");
     }
 
     /**
@@ -85,7 +84,7 @@ public class PostgresQLDaoImpl implements PostgresQLDao<ResultsEntity, Integer> 
         entityManager.remove(found);
         entityTransaction.commit();
 
-        MyLogger.log(Level.INFO, value + " deleted");
+        MyLogger.info(value + " deleted");
 
         return found;
     }
@@ -106,7 +105,7 @@ public class PostgresQLDaoImpl implements PostgresQLDao<ResultsEntity, Integer> 
      */
     private void closeAliveTransaction() {
         if (entityTransaction.isActive()) {
-            MyLogger.log(Level.ERROR, "Transaction is alive");
+            MyLogger.error("Transaction is alive");
             entityTransaction.rollback();
         }
     }

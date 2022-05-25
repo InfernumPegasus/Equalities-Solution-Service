@@ -9,7 +9,8 @@ import org.apache.logging.log4j.Logger;
  */
 public class MyLogger {
 
-    private static final Logger logger = LogManager.getLogger(MyLogger.class);
+    private static final Logger logger =
+            LogManager.getLogger(MyLogger.class);
 
     /**
      * Logs {@link Object} in certain {@link Level}
@@ -20,4 +21,15 @@ public class MyLogger {
         logger.log(level, message);
     }
 
+    public static void warn(Object message) {
+        log(Level.WARN, message);
+    }
+
+    public static void info(Object message) {
+        log(Level.INFO, message);
+    }
+
+    public static void error(Object message) {
+        log(Level.ERROR, message);
+    }
 }

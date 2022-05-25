@@ -1,7 +1,6 @@
 package com.example.service.stats;
 
 import com.example.service.logger.MyLogger;
-import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -68,43 +67,38 @@ public class StatsProvider {
      */
     public void collect() {
 
-        MyLogger.log(Level.INFO, "Collecting stats...");
+        MyLogger.info("Collecting stats...");
 
         if (!shouldBeRecalculated) {
-            MyLogger.log(Level.WARN, "Stats need not to be recollected!");
+            MyLogger.warn("Stats need not to be recollected!");
             return;
         }
 
-        try {
-            stats.mostCommon = roots
-                    .stream()
-                    .reduce(
-                            BinaryOperator.maxBy(Comparator.comparingInt(o -> Collections.frequency(roots, o)))
-                    ).orElse(0);
+        stats.mostCommon = roots
+                .stream()
+                .reduce(
+                        BinaryOperator.maxBy(Comparator.comparingInt(o -> Collections.frequency(roots, o)))
+                ).orElse(0);
 
-            roots = roots
-                    .stream()
-                    .distinct()
-                    .sorted()
-                    .collect(Collectors.toList());
+        roots = roots
+                .stream()
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
 
-            stats.min = roots
-                    .stream()
-                    .min(Comparator.comparing(Long::valueOf))
-                    .orElse(0);
+        stats.min = roots
+                .stream()
+                .min(Comparator.comparing(Long::valueOf))
+                .orElse(0);
 
-            stats.max = roots
-                    .stream()
-                    .max(Comparator.comparing(Long::valueOf))
-                    .orElse(0);
+        stats.max = roots
+                .stream()
+                .max(Comparator.comparing(Long::valueOf))
+                .orElse(0);
 
-            MyLogger.log(Level.WARN, "Stats recollected!");
+        MyLogger.warn("Stats recollected!");
 
-            shouldBeRecalculated = false;
-        } catch (NullPointerException exception) {
-            MyLogger.log(Level.ERROR, "Error while collecting stats!");
-            throw new RuntimeException(exception);
-        }
+        shouldBeRecalculated = false;
     }
 
     /**
@@ -113,7 +107,7 @@ public class StatsProvider {
      * to collecting stats again.
      * @param root value to be added
      */
-    public void addRoot(@NotNull Integer root) {
+    public void add(@NotNull Integer root) {
         roots.add(root);
         shouldBeRecalculated = true;
     }
