@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Supplier;
 
 
@@ -73,8 +75,13 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
      */
     public Collection<Integer> solve(@NotNull Collection<InputParams> params) {
 
+        Executor executor = Executors.newFixedThreadPool(4);
+
         return params.stream().map(item ->
-                        CompletableFuture.supplyAsync(calculateRootWrapper(item)))
+                {
+                    MyLogger.warn("Thread: " + Thread.currentThread().getName());
+                    return CompletableFuture.supplyAsync(calculateRootWrapper(item), executor);
+                })
                 .map(CompletableFuture::join)
                 .filter(Objects::nonNull)
                 .peek(root -> {
