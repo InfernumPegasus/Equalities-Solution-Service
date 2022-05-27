@@ -41,16 +41,26 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
         // Increasing requests counter
         statsProvider.increaseTotalRequests();
 
-        int res = cache.contains(params) ? cache.get(params) :
-                params.getSecondValue() - params.getFirstValue();
-
-        boolean correct = res >= params.getLeftBorder() && res <= params.getRightBorder();
-
-        if (!correct) {
-            throw new IllegalArgumentException("Out of borders: " + params);
+        if (cache.contains(params)) {
+            MyLogger.warn("Root for " + params + " found in cache!");
+            return cache.get(params);
         }
 
-        return res;
+        MyLogger.warn("Root for " + params + " was not found in cache!");
+
+        int root = params.getSecondValue() - params.getFirstValue();
+
+        boolean correct = root >= params.getLeftBorder() && root <= params.getRightBorder();
+
+        if (!correct) {
+            statsProvider.increaseWrongRequests();
+            var msg = """
+                    Root %d is out of borders [%d, %d]!
+                    """.formatted(root, params.getLeftBorder(), params.getRightBorder());
+            throw new IllegalArgumentException(msg);
+        }
+
+        return root;
     }
 
     /**
@@ -77,16 +87,16 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
 
         Executor executor = Executors.newFixedThreadPool(4);
 
-        return params.stream().map(item ->
-                {
+        return params.stream().map(item -> {
                     MyLogger.warn("Thread: " + Thread.currentThread().getName());
-                    return CompletableFuture.supplyAsync(calculateRootWrapper(item), executor);
+                    return CompletableFuture.supplyAsync(calculateRootSupplier(item), executor);
                 })
                 .map(CompletableFuture::join)
                 .filter(Objects::nonNull)
                 .peek(root -> {
                     // Saving to db
-                    postgresQLDao.save(root);
+//                    postgresQLDao.save(root);
+                    MyLogger.warn("DB saving...");
                     // Adding to statistics
                     statsProvider.add(root);
                 }).toList();
@@ -100,7 +110,7 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
      * @return result supplier
      */
     @NotNull
-    private Supplier<Integer> calculateRootWrapper(InputParams inputParams) {
+    private Supplier<Integer> calculateRootSupplier(InputParams inputParams) {
         return () -> {
             try {
                 return calculateRoot(inputParams);

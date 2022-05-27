@@ -49,12 +49,7 @@ public class CacheService {
      * @return found value, null otherwise
      */
     public Integer get(InputParams params) {
-        if (solutions.containsKey(params)) {
-            MyLogger.warn("Root for " + params + " found in cache!");
-            return solutions.get(params);
-        }
-        MyLogger.warn("Root for " + params + " was not found in cache!");
-        return null;
+        return solutions.get(params);
     }
 
     public Map<InputParams, Integer> getSolutions() {

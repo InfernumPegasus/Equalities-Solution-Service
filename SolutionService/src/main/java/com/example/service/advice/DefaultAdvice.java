@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import javax.persistence.PersistenceException;
 
@@ -36,6 +37,8 @@ public class DefaultAdvice extends ResponseEntityExceptionHandler {
         this.statsProvider = statsProvider;
     }
 
+    /* Overridden Spring Exceptions handlers */
+
     @Override
     protected @NotNull ResponseEntity<Object> handleHttpMessageNotReadable(
             @NotNull HttpMessageNotReadableException ex,
@@ -44,10 +47,18 @@ public class DefaultAdvice extends ResponseEntityExceptionHandler {
             @NotNull WebRequest request) {
 
         statsProvider.increaseWrongRequests();
+        logger.error("HttpMessageNotReadableException: " + ex.getMessage(), ex);
+        return new ResponseEntity<>(ex.getMessage(), status);
+    }
 
-        var msg = "Wrong json provided! First and second parameters required!";
-
-        return new ResponseEntity<>(msg, status);
+    @Override
+    protected @NotNull ResponseEntity<Object> handleNoHandlerFoundException(
+            @NotNull NoHandlerFoundException ex,
+            @NotNull HttpHeaders headers,
+            @NotNull HttpStatus status,
+            @NotNull WebRequest request) {
+        logger.error("NoHandlerFoundException: " + ex.getMessage(), ex);
+        return new ResponseEntity<>("No handler found for: " + ex.getMessage(), headers, status);
     }
 
     /*BAD_REQUEST status Exceptions handler*/
