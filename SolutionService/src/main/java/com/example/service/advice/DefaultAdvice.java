@@ -47,7 +47,7 @@ public class DefaultAdvice extends ResponseEntityExceptionHandler {
             @NotNull WebRequest request) {
 
         statsProvider.increaseWrongRequests();
-        logger.error("HttpMessageNotReadableException: " + ex.getMessage(), ex);
+        logger.error("HttpMessageNotReadableException: " + ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), status);
     }
 

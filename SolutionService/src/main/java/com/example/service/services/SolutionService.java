@@ -95,9 +95,10 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
                 .filter(Objects::nonNull)
                 .peek(root -> {
                     // Saving to db
-//                    postgresQLDao.save(root);
-                    MyLogger.warn("DB saving...");
+                    MyLogger.warn("Saving to db...");
+                    postgresQLDao.save(root);
                     // Adding to statistics
+                    MyLogger.info("Adding to stats...");
                     statsProvider.add(root);
                 }).toList();
     }
