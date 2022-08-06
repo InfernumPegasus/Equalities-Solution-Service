@@ -1,12 +1,18 @@
 package com.example.service.input;
 
 import lombok.Data;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Data
 public class InputParams {
+
+    @NotNull
     private Integer firstValue;
+
+    @NotNull
     private Integer secondValue;
+
     private Integer leftBorder;
     private Integer rightBorder;
 
@@ -15,11 +21,7 @@ public class InputParams {
             Integer secondValue,
             Integer leftBorder,
             Integer rightBorder
-    ) throws IllegalArgumentException {
-        if (firstValue == null || secondValue == null) {
-            throw new IllegalArgumentException("Wrong params provided!");
-        }
-
+    ) {
         this.firstValue  = firstValue;
         this.secondValue = secondValue;
 

@@ -1,7 +1,10 @@
 package com.example.service;
 
 import com.example.service.input.InputParams;
+import com.example.service.validation.InputParamsValidator;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 class ServiceApplicationTests {
@@ -48,5 +51,27 @@ class ServiceApplicationTests {
                 .count();
 
         assert count == params.size();
+    }
+
+    @Test
+    void isCollectionValidated() {
+        ArrayList<InputParams> params = new ArrayList<>();
+        params.add(new InputParams(null, 34, 23, 34));
+        params.add(new InputParams(21, null, 23, 34));
+        params.add(new InputParams(9, 34, null, null));
+        params.add(new InputParams(null, null, null, null));
+
+        var validated =
+                InputParamsValidator.getValidByDefault(params);
+        System.out.println(validated);
+
+        assert validated.size() == 1;
+    }
+
+    @Test
+    void isSingleParamsCorrect() {
+        InputParams params = new InputParams(null, 23, 34, null);
+
+        assert !InputParamsValidator.checkByDefault(params);
     }
 }

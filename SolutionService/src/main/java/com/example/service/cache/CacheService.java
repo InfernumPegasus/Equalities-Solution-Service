@@ -2,6 +2,7 @@ package com.example.service.cache;
 
 import com.example.service.logger.MyLogger;
 import com.example.service.input.InputParams;
+import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import java.util.Map;
@@ -20,15 +21,20 @@ public class CacheService {
      * @param params key
      * @param root value
      */
-    public void add(@NotNull InputParams params,
-                    @NotNull Integer root) {
+    public void add(
+            @NotNull InputParams params,
+            @NotNull Integer root
+    ) {
         if (!solutions.containsKey(params)) {
             solutions.put(params, root);
-            var message = """
-            Value %s@root=%d added to cache!
-            """.formatted(params, root);
 
-            MyLogger.info(message);
+            StringFormattedMessage message =
+                    new StringFormattedMessage(
+                            "Value %s@root=%d added to cache!",
+                            params,
+                            root
+                    );
+            MyLogger.info(message.getFormattedMessage());
         }
     }
 
@@ -38,7 +44,9 @@ public class CacheService {
      * @param value value to check
      * @return true if exists, false otherwise
      */
-    public boolean contains(InputParams value) {
+    public boolean contains(
+            InputParams value
+    ) {
         return solutions.containsKey(value);
     }
 
@@ -48,7 +56,9 @@ public class CacheService {
      * @param params key
      * @return found value, null otherwise
      */
-    public Integer get(InputParams params) {
+    public Integer get(
+            InputParams params
+    ) {
         return solutions.get(params);
     }
 

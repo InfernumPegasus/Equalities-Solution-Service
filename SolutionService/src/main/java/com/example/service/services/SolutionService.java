@@ -5,6 +5,7 @@ import com.example.service.dao.PostgresQLDaoImpl;
 import com.example.service.input.InputParams;
 import com.example.service.logger.MyLogger;
 import com.example.service.stats.StatsProvider;
+import org.apache.logging.log4j.message.StringFormattedMessage;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,20 @@ import java.util.function.Supplier;
  * equalities from provided params.
  */
 @Service
-public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cache, StatsProvider statsProvider) {
+public class SolutionService {
+    private final PostgresQLDaoImpl postgresQLDao;
+    private final CacheService cache;
+    private final StatsProvider statsProvider;
 
     @Autowired
-    public SolutionService {
+    public SolutionService(
+            PostgresQLDaoImpl postgresQLDao,
+            CacheService cache,
+            StatsProvider statsProvider
+    ) {
+        this.postgresQLDao = postgresQLDao;
+        this.cache = cache;
+        this.statsProvider = statsProvider;
     }
 
     /**
@@ -37,7 +48,9 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
      * @param params value for solving
      * @return {@link Integer} calculated root
      */
-    private Integer calculateRoot(InputParams params) {
+    private Integer calculateRoot(
+            InputParams params
+    ) {
         // Increasing requests counter
         statsProvider.increaseTotalRequests();
 
@@ -54,10 +67,14 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
 
         if (!correct) {
             statsProvider.increaseWrongRequests();
-            var msg = """
-                    Root %d is out of borders [%d, %d]!
-                    """.formatted(root, params.getLeftBorder(), params.getRightBorder());
-            throw new IllegalArgumentException(msg);
+            StringFormattedMessage message =
+                    new StringFormattedMessage(
+                            "Root %d is out of borders [%d, %d]!",
+                            root,
+                            params.getLeftBorder(),
+                            params.getRightBorder()
+                    );
+            throw new IllegalArgumentException(message.getFormattedMessage());
         }
 
         return root;
@@ -87,7 +104,8 @@ public record SolutionService(PostgresQLDaoImpl postgresQLDao, CacheService cach
 
         Executor executor = Executors.newFixedThreadPool(4);
 
-        return params.stream().map(item -> {
+        return params.stream()
+                .map(item -> {
                     MyLogger.warn("Thread: " + Thread.currentThread().getName());
                     return CompletableFuture.supplyAsync(calculateRootSupplier(item), executor);
                 })
